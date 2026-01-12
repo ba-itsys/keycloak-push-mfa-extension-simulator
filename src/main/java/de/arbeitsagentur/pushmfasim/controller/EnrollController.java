@@ -35,7 +35,7 @@ import org.springframework.web.client.RestTemplate;
 public class EnrollController {
 
     private final RestTemplate restTemplate = new RestTemplate();
- 
+
     @Value("classpath:static/keys/rsa-jwk.json")
     private Resource jwkResource;
 
