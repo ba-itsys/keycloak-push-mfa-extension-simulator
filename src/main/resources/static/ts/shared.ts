@@ -10,7 +10,11 @@ export function getById<T extends HTMLElement>(id: string): T {
   return el as T;
 }
 
-export function setMessage(element: HTMLElement, message: string, type: 'success' | 'error' | 'info' = 'info') {
+export function setMessage(
+  element: HTMLElement,
+  message: string,
+  type: 'success' | 'error' | 'info' = 'info'
+) {
   element.textContent = message;
   element.className = `message message-${type}`;
 }

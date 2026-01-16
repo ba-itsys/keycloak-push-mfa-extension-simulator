@@ -16,7 +16,6 @@ jobs:
     if: github.repository_owner == 'ba-itsys'
     runs-on: ubuntu-latest
     steps:
-
       # Generate a token for the GitHub App
       - uses: actions/create-github-app-token@v2
         id: app-token
