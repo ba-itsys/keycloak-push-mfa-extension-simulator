@@ -1,6 +1,5 @@
-import { onReady } from "../shared.js";
+import { onReady } from '../shared.js';
 
 onReady(() => {
-
-  console.log("Info page loaded");
+  // Page loaded
 });

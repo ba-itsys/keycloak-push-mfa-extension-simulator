@@ -1,24 +1,18 @@
-import {
-  decodeJwt,
-  importJWK,
-  JWTHeaderParameters,
-  JWTPayload,
-  SignJWT,
-} from "jose";
-import type { JWK, KeyLike } from "jose";
-import { v4 as uuidv4 } from "uuid";
+import { decodeJwt, importJWK, JWTHeaderParameters, JWTPayload, SignJWT } from 'jose';
+import type { JWK, KeyLike } from 'jose';
+import { v4 as uuidv4 } from 'uuid';
 
-const DPOP_HEADER_TYPE = "dpop+jwt";
-const JWT_HEADER_TYPE = "JWT";
-const ALG_RS256 = "RS256";
-const KID = "DEVICE_KEY_ID";
-const DEVICE_KEY_SUFFIX = "device-key-";
+const DPOP_HEADER_TYPE = 'dpop+jwt';
+const JWT_HEADER_TYPE = 'JWT';
+const ALG_RS256 = 'RS256';
+const KID = 'DEVICE_KEY_ID';
+const DEVICE_KEY_SUFFIX = 'device-key-';
 const DEVICE_STATIC_ID = `device-static-id`;
-const DEVICE_ALIAS = "-device-alias-";
-const DEVICE_TYPE = "ios";
-const PUSH_PROVIDER_ID = "demo-push-provider-token";
-const PUSH_PROVIDER_TYPE = "log";
-const DEVICE_LABEL = "Demo Phone";
+const DEVICE_ALIAS = '-device-alias-';
+const DEVICE_TYPE = 'ios';
+const PUSH_PROVIDER_ID = 'demo-push-provider-token';
+const PUSH_PROVIDER_TYPE = 'log';
+const DEVICE_LABEL = 'Demo Phone';
 
 export type DpopPayload = {
   cid?: string;
@@ -44,10 +38,10 @@ export type ConfirmLoginValues = {
 };
 
 export function unpackEnrollmentToken(token: string): EnrollmentValues | null {
-  const enrollPayload = decodeJwt(token);
-  const enrollmentId = (enrollPayload as any).enrollmentId;
-  const nonce = (enrollPayload as any).nonce;
-  const userId = (enrollPayload as any).sub;
+  const enrollPayload = decodeJwt(token) as Record<string, unknown>;
+  const enrollmentId = enrollPayload.enrollmentId as string | undefined;
+  const nonce = enrollPayload.nonce as string | undefined;
+  const userId = enrollPayload.sub as string | undefined;
 
   if (!enrollmentId || !nonce || !userId) {
     return null;
@@ -55,11 +49,7 @@ export function unpackEnrollmentToken(token: string): EnrollmentValues | null {
   return { enrollmentId, nonce, userId };
 }
 
-
-export async function createEnrollmentJwt(
-  enrollmentValues: EnrollmentValues,
-  context: string,
-) {
+export async function createEnrollmentJwt(enrollmentValues: EnrollmentValues, context: string) {
   const exp = Math.floor(Date.now() / 1000) + 300;
   const { privateKey, jwkPub } = await loadJwkFile();
 
@@ -75,7 +65,7 @@ export async function createEnrollmentJwt(
   jwkPub.kid = deviceKeyId;
   const cnf = { jwk: jwkPub };
 
-  let jwtPayload = {
+  const jwtPayload = {
     enrollmentId: enrollmentValues.enrollmentId,
     nonce: enrollmentValues.nonce,
     sub: enrollmentValues.userId,
@@ -87,18 +77,14 @@ export async function createEnrollmentJwt(
     deviceLabel: DEVICE_LABEL,
     cnf,
   };
-  console.debug("Creating Enrollment with credentialId: ", credentialId);
   return await signJwt(jwtPayload, protectedHeader, exp, privateKey);
 }
 
+export function unpackLoginConfirmToken(token: string): ConfirmLoginValues | null {
+  const confirmPayload = decodeJwt(token) as Record<string, unknown>;
 
-export function unpackLoginConfirmToken(
-  token: string,
-): ConfirmLoginValues | null {
-  const confirmPayload = decodeJwt(token);
-
-  const challengeId = (confirmPayload as any).cid;
-  const userId = (confirmPayload as any).credId;
+  const challengeId = confirmPayload.cid as string | undefined;
+  const userId = confirmPayload.credId as string | undefined;
 
   if (!challengeId || !userId) {
     return null;
@@ -136,14 +122,13 @@ export async function createConfirmJwt(payload: DpopPayload) {
   return await signJwt(payload, protectedHeader, exp, privateKey);
 }
 
-
 export async function createAccessToken(userId: string, htu: string) {
   const ctxEndIndex = userId?.indexOf(DEVICE_ALIAS);
   const _aliasAndEkid = userId.substring(ctxEndIndex, userId.length);
   const ekid = _aliasAndEkid?.slice(DEVICE_ALIAS.length) as string;
 
   const dpopTokenPayload: DpopPayload = {
-    htm: "POST",
+    htm: 'POST',
     htu: htu,
     sub: ekid,
     deviceId: DEVICE_STATIC_ID,
@@ -156,7 +141,7 @@ export async function createChallengeToken(
   userId: string,
   challengeId: string,
   action: string = 'approve',
-  userVerification?: string,
+  userVerification?: string
 ) {
   const body: DpopPayload = {
     cid: challengeId,
@@ -180,7 +165,7 @@ async function createDpopJwt(dpopPayload: DpopPayload) {
     dpopPayload,
     { alg: ALG_RS256, typ: DPOP_HEADER_TYPE, jwk: jwkPub },
     uuidv4(),
-    privateKey,
+    privateKey
   );
 }
 
@@ -190,9 +175,8 @@ export type JwkBundle = {
 };
 
 export async function loadJwkFile() {
-
   const res = await fetch(`keys/rsa-jwk.json`, {
-    cache: "no-store",
+    cache: 'no-store',
   });
 
   if (!res.ok) {
@@ -201,18 +185,37 @@ export async function loadJwkFile() {
 
   const jwk = (await res.json()) as JwkBundle;
 
-  const publicKey = await importJWK(jwk.public, "RS256");
-  const privateKey = await importJWK(jwk.private, "RS256");
-  const jwkPub = jwk.public;
+  try {
+    // Jose v5 requires Web Crypto API - ensure it's available
+    if (typeof globalThis === 'undefined' || !globalThis.crypto) {
+      throw new Error('Web Crypto API not available');
+    }
 
-  return { privateKey, publicKey, jwkPub };
+    // Pass both JWK and algorithm options
+    const publicKey = await importJWK(jwk.public as JWK, ALG_RS256);
+    const privateKey = await importJWK(jwk.private as JWK, ALG_RS256);
+    const jwkPub = jwk.public;
+
+    return { privateKey, publicKey, jwkPub };
+  } catch (error) {
+    console.error('Error importing JWK:', error);
+    console.error('Public JWK:', jwk.public);
+    console.error('Private JWK:', jwk.private);
+    console.error(
+      'Web Crypto available:',
+      typeof globalThis !== 'undefined' && !!globalThis.crypto
+    );
+    throw new Error(
+      `Failed to import JWK: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
 }
 
 async function signDpopJwt(
   payload: JWTPayload,
   protectedHeader: JWTHeaderParameters,
   jti: string,
-  privateKey: KeyLike | Uint8Array | JWK,
+  privateKey: KeyLike | Uint8Array | JWK
 ) {
   return await new SignJWT(payload)
     .setProtectedHeader(protectedHeader)
@@ -225,12 +228,10 @@ async function signJwt(
   payload: JWTPayload,
   protectedHeader: JWTHeaderParameters,
   exp: number | string | Date,
-  privateKey: KeyLike | Uint8Array | JWK,
+  privateKey: KeyLike | Uint8Array | JWK
 ) {
   return await new SignJWT(payload)
     .setProtectedHeader(protectedHeader)
     .setExpirationTime(exp)
     .sign(privateKey);
 }
-
- 

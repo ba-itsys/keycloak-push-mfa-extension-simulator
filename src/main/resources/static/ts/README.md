@@ -25,11 +25,13 @@ src/main/resources/static/
 ## Build-Befehle
 
 ### Einmalig bauen
+
 ```bash
 npm run build
 ```
 
 ### Development mit Watch-Modus
+
 ```bash
 npm run dev
 ```
@@ -63,6 +65,6 @@ Nutze `shared.ts` und `util/` für Code, der über mehrere Seiten verwendet wird
 
 ```typescript
 // In pages/enroll.ts
-import { getById, onReady } from "../shared.js";
-import { createNewKeyPair } from "../util/keys-util.js";
+import { getById, onReady } from '../shared.js';
+import { createNewKeyPair } from '../util/keys-util.js';
 ```

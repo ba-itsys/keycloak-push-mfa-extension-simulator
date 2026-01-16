@@ -1,40 +1,37 @@
+export const DEVICE_CLIENT_ID = 'push-device-client';
+export const DEVICE_CLIENT_SECRET = 'device-client-secret';
+import { ENROLL_COMPLETE, TOKEN_ENDPOINT } from './urls.js';
 
-
-export const DEVICE_CLIENT_ID = "push-device-client";
-export const DEVICE_CLIENT_SECRET = "device-client-secret";
-import { ENROLL_COMPLETE } from "./urls.js";
-
-export async function postEnrollComplete(enrollReplyToken: string, url?:  URL) {
-
+export async function postEnrollComplete(enrollReplyToken: string, url?: URL) {
   return await post(
-      url?.toString() + ENROLL_COMPLETE,
-    { "Content-Type": "application/json" },
-    JSON.stringify({ token: enrollReplyToken }),
+    url?.toString() + ENROLL_COMPLETE,
+    { 'Content-Type': 'application/json' },
+    JSON.stringify({ token: enrollReplyToken })
   );
 }
 
-export async function postAccessToken(dPop: string) {
+export async function postAccessToken(url: string, dPop: string) {
   const header = {
-    "Content-Type": "application/x-www-form-urlencoded",
+    'Content-Type': 'application/x-www-form-urlencoded',
     DPoP: dPop,
   };
   const body = new URLSearchParams({
-    grant_type: "client_credentials",
+    grant_type: 'client_credentials',
     client_id: DEVICE_CLIENT_ID,
     client_secret: DEVICE_CLIENT_SECRET,
   });
-  return await post("", header, body);
+  return await post(url + TOKEN_ENDPOINT, header, body);
 }
 
 export async function postChallengesResponse(
   url: string,
   dPop: string,
   accessToken: string,
-  token: string,
+  token: string
 ) {
   const header = {
     Authorization: `DPoP ${accessToken}`,
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
     DPoP: dPop,
   };
   const body = {
@@ -58,13 +55,11 @@ export async function getPendingChallenges(url: string, dPop: string, accessToke
 async function post(
   url: string,
   headers?: HeadersInit,
-  body?: any,
+  body?: string | BodyInit
 ): Promise<Response> {
   return await fetch(url, {
-    method: "POST",
+    method: 'POST',
     headers: headers,
     body: body,
   });
 }
-
- 

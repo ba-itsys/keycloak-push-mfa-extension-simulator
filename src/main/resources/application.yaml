@@ -3,7 +3,7 @@ trace: false
 
 logging:
   pattern:
-    console: "%d{HH:mm:ss} [%thread] [%-5level] %class{36}.%M | %msg%n"
+    console: '%d{HH:mm:ss} [%thread] [%-5level] %class{36}.%M | %msg%n'
   level:
     de.ba: debug
     root: info
@@ -11,11 +11,15 @@ logging:
 app:
   basepath:
   web:
-    title: "PushMFA-Simulator"
-  env: "dev"
+    title: 'PushMFA-Simulator'
+  env: 'dev'
 
 server:
   port: 5000
+  address: 0.0.0.0
+  forward-headers-strategy: framework
+  servlet:
+    context-path: /mock
 
 security:
   jwk:
@@ -23,8 +27,8 @@ security:
 
 spring:
   application:
-    name: "pushmfa-simulator"
-    version: "latest"
+    name: 'pushmfa-simulator'
+    version: 'latest'
   devtools:
     livereload:
       enabled: true
@@ -39,20 +43,20 @@ spring:
     mapper:
       accept-case-insensitive-properties: true
   thymeleaf:
-    prefix: "classpath:views/"
+    prefix: 'classpath:views/'
     cache: false
     suffix: .html
   web:
     resources:
       cache:
         period: 0
-      static-locations: "classpath:static"
+      static-locations: 'classpath:static'
 
 management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: '*'
   endpoint:
     health:
       probes:
