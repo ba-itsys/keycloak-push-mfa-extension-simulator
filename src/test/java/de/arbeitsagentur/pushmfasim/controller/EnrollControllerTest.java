@@ -99,14 +99,14 @@ class EnrollControllerTest {
     @Test
     void testInvalidJwtFormat() throws Exception {
         assertThrows(Exception.class, () -> {
-            enrollController.completeEnrollProcess("not.a.jwt", "context", null);
+            enrollController.completeEnrollProcess("not.a.jwt", "context", null, null);
         });
     }
 
     @Test
     void testInvalidJwtToken() throws Exception {
         assertThrows(Exception.class, () -> {
-            enrollController.completeEnrollProcess("invalid-token-format", null, null);
+            enrollController.completeEnrollProcess("invalid-token-format", null, null, null);
         });
     }
 
@@ -124,7 +124,7 @@ class EnrollControllerTest {
         jwt.sign(new RSASSASigner(rsaKey));
         String token = jwt.serialize();
 
-        ResponseEntity<String> response = enrollController.completeEnrollProcess(token, "context", null);
+        ResponseEntity<String> response = enrollController.completeEnrollProcess(token, "context", null, null);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertEquals("Invalid token: missing required claims", response.getBody());
     }
@@ -141,7 +141,7 @@ class EnrollControllerTest {
         jwt.sign(new RSASSASigner(rsaKey));
         String token = jwt.serialize();
 
-        ResponseEntity<String> response = enrollController.completeEnrollProcess(token, "context", null);
+        ResponseEntity<String> response = enrollController.completeEnrollProcess(token, "context", null, null);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertEquals("Invalid token: missing required claims", response.getBody());
     }
@@ -158,7 +158,7 @@ class EnrollControllerTest {
         jwt.sign(new RSASSASigner(rsaKey));
         String token = jwt.serialize();
 
-        ResponseEntity<String> response = enrollController.completeEnrollProcess(token, "context", null);
+        ResponseEntity<String> response = enrollController.completeEnrollProcess(token, "context", null, null);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertEquals("Invalid token: missing required claims", response.getBody());
     }
@@ -173,7 +173,8 @@ class EnrollControllerTest {
         when(restTemplate.exchange(any(String.class), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class)))
                 .thenReturn(keycloakResponse);
 
-        ResponseEntity<String> response = enrollController.completeEnrollProcess(validEnrollmentToken, "context", null);
+        ResponseEntity<String> response =
+                enrollController.completeEnrollProcess(validEnrollmentToken, "context", null, null);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("{\"status\": \"success\"}", response.getBody());
@@ -195,10 +196,27 @@ class EnrollControllerTest {
                 .thenReturn(keycloakResponse);
 
         ResponseEntity<String> response =
-                enrollController.completeEnrollProcess(validEnrollmentToken, "context", customUrl);
+                enrollController.completeEnrollProcess(validEnrollmentToken, "context", customUrl, null);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("{\"status\": \"success\"}", response.getBody());
+    }
+
+    @SuppressWarnings("null")
+    @Test
+    void testSuccessfulEnrollmentWithFcmProvider() throws Exception {
+        ResponseEntity<String> keycloakResponse = new ResponseEntity<>("{\"status\": \"success\"}", HttpStatus.OK);
+
+        when(restTemplate.exchange(any(String.class), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class)))
+                .thenReturn(keycloakResponse);
+
+        ResponseEntity<String> response =
+                enrollController.completeEnrollProcess(validEnrollmentToken, "context", null, "fcm");
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("{\"status\": \"success\"}", response.getBody());
+
+        verify(restTemplate).exchange(any(String.class), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class));
     }
 
     @SuppressWarnings("null")
@@ -209,7 +227,8 @@ class EnrollControllerTest {
         when(restTemplate.exchange(any(String.class), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class)))
                 .thenReturn(keycloakResponse);
 
-        ResponseEntity<String> response = enrollController.completeEnrollProcess(validEnrollmentToken, null, null);
+        ResponseEntity<String> response =
+                enrollController.completeEnrollProcess(validEnrollmentToken, null, null, null);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
@@ -222,7 +241,7 @@ class EnrollControllerTest {
         when(restTemplate.exchange(any(String.class), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class)))
                 .thenReturn(keycloakResponse);
 
-        ResponseEntity<String> response = enrollController.completeEnrollProcess(validEnrollmentToken, "", null);
+        ResponseEntity<String> response = enrollController.completeEnrollProcess(validEnrollmentToken, "", null, null);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
@@ -237,7 +256,8 @@ class EnrollControllerTest {
         when(restTemplate.exchange(any(String.class), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class)))
                 .thenReturn(keycloakResponse);
 
-        ResponseEntity<String> response = enrollController.completeEnrollProcess(validEnrollmentToken, "context", null);
+        ResponseEntity<String> response =
+                enrollController.completeEnrollProcess(validEnrollmentToken, "context", null, null);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertEquals("Enrollment failed", response.getBody());
@@ -251,7 +271,8 @@ class EnrollControllerTest {
         when(restTemplate.exchange(any(String.class), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class)))
                 .thenReturn(keycloakResponse);
 
-        ResponseEntity<String> response = enrollController.completeEnrollProcess(validEnrollmentToken, "context", null);
+        ResponseEntity<String> response =
+                enrollController.completeEnrollProcess(validEnrollmentToken, "context", null, null);
 
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
@@ -265,7 +286,8 @@ class EnrollControllerTest {
         when(restTemplate.exchange(any(String.class), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class)))
                 .thenReturn(keycloakResponse);
 
-        ResponseEntity<String> response = enrollController.completeEnrollProcess(validEnrollmentToken, "context", null);
+        ResponseEntity<String> response =
+                enrollController.completeEnrollProcess(validEnrollmentToken, "context", null, null);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }
@@ -280,7 +302,7 @@ class EnrollControllerTest {
         when(restTemplate.exchange(any(String.class), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class)))
                 .thenReturn(keycloakResponse);
 
-        enrollController.completeEnrollProcess(validEnrollmentToken, "test-context", null);
+        enrollController.completeEnrollProcess(validEnrollmentToken, "test-context", null, null);
 
         verify(restTemplate).exchange(any(String.class), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class));
     }
@@ -293,8 +315,8 @@ class EnrollControllerTest {
         when(restTemplate.exchange(any(String.class), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class)))
                 .thenReturn(keycloakResponse);
 
-        ResponseEntity<String> response =
-                enrollController.completeEnrollProcess(validEnrollmentToken, "context-with-special-chars_123", null);
+        ResponseEntity<String> response = enrollController.completeEnrollProcess(
+                validEnrollmentToken, "context-with-special-chars_123", null, null);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
@@ -322,7 +344,7 @@ class EnrollControllerTest {
         when(restTemplate.exchange(any(String.class), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class)))
                 .thenReturn(keycloakResponse);
 
-        ResponseEntity<String> response = enrollController.completeEnrollProcess(longToken, "context", null);
+        ResponseEntity<String> response = enrollController.completeEnrollProcess(longToken, "context", null, null);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
@@ -335,7 +357,7 @@ class EnrollControllerTest {
         when(restTemplate.exchange(any(String.class), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class)))
                 .thenReturn(keycloakResponse);
 
-        enrollController.completeEnrollProcess(validEnrollmentToken, "context", null);
+        enrollController.completeEnrollProcess(validEnrollmentToken, "context", null, null);
 
         verify(restTemplate).exchange(any(String.class), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class));
     }
@@ -363,7 +385,7 @@ class EnrollControllerTest {
         when(restTemplate.exchange(any(String.class), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class)))
                 .thenReturn(keycloakResponse);
 
-        ResponseEntity<String> response = enrollController.completeEnrollProcess(expiredToken, "context", null);
+        ResponseEntity<String> response = enrollController.completeEnrollProcess(expiredToken, "context", null, null);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
@@ -389,7 +411,7 @@ class EnrollControllerTest {
         when(restTemplate.exchange(any(String.class), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class)))
                 .thenReturn(keycloakResponse);
 
-        ResponseEntity<String> response = enrollController.completeEnrollProcess(token, "context", null);
+        ResponseEntity<String> response = enrollController.completeEnrollProcess(token, "context", null, null);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }

@@ -85,11 +85,20 @@
               <small class="form-text text-muted">e.g. http://localhost:8080/realms/demo</small>
               <small class="form-text text-muted">e.g. https://myapp.local/realms/demo</small>
             </div>
-            <div class="col-md-6 mb-3">
+            <div class="col-md-3 mb-3">
               <label for="context" class="form-label">
                 <b>Enter context [optional]:</b>
               </label>
               <input id="context" type="text" class="form-control" placeholder="e.g. deviceXY" />
+            </div>
+            <div class="col-md-3 mb-3">
+              <label for="provider-type" class="form-label">
+                <b>Select provider type [optional]:</b>
+              </label>
+              <select id="provider-type" class="form-control">
+                <option value="log">log</option>
+                <option value="fcm">fcm</option>
+              </select>
             </div>
           </div>
 
