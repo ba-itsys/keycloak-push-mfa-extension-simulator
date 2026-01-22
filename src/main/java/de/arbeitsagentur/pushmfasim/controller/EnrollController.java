@@ -60,7 +60,8 @@ public class EnrollController {
     public ResponseEntity<String> completeEnrollProcess(
             @RequestParam String token,
             @RequestParam(required = false) String context,
-            @RequestParam(required = false) String iamUrl)
+            @RequestParam(required = false) String iamUrl,
+            @RequestParam(required = false) String pushProviderType)
             throws Exception {
 
         logger.info("Starting enrollment completion process");
@@ -122,7 +123,9 @@ public class EnrollController {
                 .claim("deviceId", "device-static-id")
                 .claim("deviceLabel", "Demo Phone")
                 .claim("pushProviderId", "demo-push-provider-token")
-                .claim("pushProviderType", "log")
+                .claim(
+                        "pushProviderType",
+                        pushProviderType != null && !pushProviderType.isEmpty() ? pushProviderType : "log")
                 .claim("credentialId", userId + "-device-alias-" + context)
                 .claim("cnf", cnf)
                 .build();
