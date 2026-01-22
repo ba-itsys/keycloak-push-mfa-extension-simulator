@@ -10,6 +10,7 @@ onReady(() => {
   const tokenEl = getById<HTMLInputElement>('token');
   const contextEl = getById<HTMLInputElement>('context');
   const iamUrlEl = getById<HTMLInputElement>('iam-url');
+  const providerTypeEl = getById<HTMLInputElement>('provider-type');
   const outEl = getById<HTMLInputElement>('out');
 
   // actions
@@ -68,6 +69,7 @@ onReady(() => {
       formData.append('token', _token);
       if (_context) formData.append('context', _context);
       formData.append('iamUrl', _iamUrl ? _iamUrl.toString() : 'http://localhost:8080/realms/demo');
+      formData.append('pushProviderType', providerTypeEl.value.trim() || 'log');
 
       const response = await fetch('./enroll/complete', {
         method: 'POST',
@@ -110,7 +112,7 @@ onReady(() => {
         outEl.textContent = 'invalid enrollment token payload';
         return;
       }
-      const enrollmentJwt = await createEnrollmentJwt(enrollmentValues, _context);
+      const enrollmentJwt = await createEnrollmentJwt(enrollmentValues, _context, providerTypeEl.value.trim());
       const keycloakResponse = await postEnrollComplete(enrollmentJwt, _iamUrl as URL, _token);
 
       if (!keycloakResponse.ok) {
