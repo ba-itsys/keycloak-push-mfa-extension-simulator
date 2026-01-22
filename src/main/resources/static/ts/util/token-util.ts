@@ -52,7 +52,7 @@ export function unpackEnrollmentToken(token: string): EnrollmentValues | null {
   return { enrollmentId, nonce, userId, iss };
 }
 
-export async function createEnrollmentJwt(enrollmentValues: EnrollmentValues, context: string) {
+export async function createEnrollmentJwt(enrollmentValues: EnrollmentValues, context: string, providerType: string) {
   const exp = Math.floor(Date.now() / 1000) + 300;
   const { privateKey, jwkPub } = await loadJwkFile();
 
@@ -74,7 +74,7 @@ export async function createEnrollmentJwt(enrollmentValues: EnrollmentValues, co
     sub: enrollmentValues.userId,
     deviceType: DEVICE_TYPE,
     pushProviderId: PUSH_PROVIDER_ID,
-    pushProviderType: PUSH_PROVIDER_TYPE,
+    pushProviderType: providerType ? providerType : PUSH_PROVIDER_TYPE,
     credentialId: credentialId,
     deviceId: DEVICE_STATIC_ID,
     deviceLabel: DEVICE_LABEL,
