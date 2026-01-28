@@ -1,6 +1,7 @@
 package de.arbeitsagentur.pushmfasim.controller;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -12,19 +13,25 @@ import de.arbeitsagentur.pushmfasim.model.FcmMessageNotification;
 import de.arbeitsagentur.pushmfasim.model.FcmMessageRequest;
 import de.arbeitsagentur.pushmfasim.model.FcmMessageResponse;
 import de.arbeitsagentur.pushmfasim.model.FcmTokenResponse;
+import de.arbeitsagentur.pushmfasim.services.SseService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-@WebMvcTest(FirebaseController.class)
+@WebMvcTest({FirebaseController.class, SseService.class})
 class FirebaseControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Mock
+    private SseService sseService;
 
     private ObjectMapper objectMapper;
 
@@ -109,5 +116,12 @@ class FirebaseControllerTest {
         assertTrue(responseContent.contains("\"client_email\":\"fcm-mock@test.de\""));
         assertTrue(responseContent.contains("\"token_uri\":\"http://localhost:5000/mock/fcm/token\""));
         assertTrue(responseContent.contains("\"private_key\":\"-----BEGIN PRIVATE KEY-----"));
+    }
+
+    @Test
+    void testSseEndpoint() throws Exception {
+        SseEmitter emitter = new SseEmitter(1L);
+        when(sseService.createSseEmitter()).thenReturn(emitter);
+        mockMvc.perform(get("/fcm/register-sse")).andExpect(status().isOk());
     }
 }
