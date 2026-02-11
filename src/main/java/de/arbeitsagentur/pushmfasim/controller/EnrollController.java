@@ -74,6 +74,7 @@ public class EnrollController {
             iamUrl = defaultIamUrl;
         }
         logger.debug("Using IAM URL: {}", iamUrl);
+        logger.trace("Parsing enrollment token");
         JWT jwt = JWTParser.parse(token);
         JWTClaimsSet claims = jwt.getJWTClaimsSet();
 
@@ -83,7 +84,11 @@ public class EnrollController {
         String nonce = claims.getClaims().containsKey("nonce") ? claims.getStringClaim("nonce") : null;
         String userId = claims.getClaims().containsKey("sub") ? claims.getStringClaim("sub") : null;
 
-        logger.debug("Extracted claims - enrollmentId: {}, userId: {}", enrollmentId, userId);
+        logger.debug(
+                "Extracted claims - enrollmentId: {}, userId: {}, nonce present: {}",
+                enrollmentId,
+                userId,
+                nonce != null);
 
         if (enrollmentId == null || nonce == null || userId == null) {
             logger.warn("Invalid token: missing required claims");
@@ -98,16 +103,23 @@ public class EnrollController {
             jwkResource = new FileSystemResource(jwkPath);
             if (!jwkResource.exists()) {
                 // Fallback auf Classpath für lokale Entwicklung
+                logger.debug("JWK file not found at {}, falling back to classpath", jwkPath);
                 jwkResource = new ClassPathResource("static/keys/rsa-jwk.json");
+            } else {
+                logger.debug("Loading JWK from file system: {}", jwkPath);
             }
         } catch (Exception e) {
             // Fallback auf Classpath
+            logger.debug("Exception while loading JWK from file system, falling back to classpath: {}", e.getMessage());
             jwkResource = new ClassPathResource("static/keys/rsa-jwk.json");
         }
+
+        logger.trace("Loading JWK from resource: {}", jwkResource);
 
         JsonNode root = objectMapper.readTree(jwkResource.getInputStream());
         JsonNode publicNode = root.get("public");
         JsonNode privateNode = root.get("private");
+        logger.debug("JWK loaded successfully with public and private keys");
 
         Map<String, Object> publicMap =
                 objectMapper.convertValue(publicNode, new TypeReference<Map<String, Object>>() {});
@@ -115,10 +127,16 @@ public class EnrollController {
                 objectMapper.convertValue(privateNode, new TypeReference<Map<String, Object>>() {});
         RSAKey publicJwk = RSAKey.parse(publicMap);
         RSAKey privateJwk = RSAKey.parse(privateMap);
+        logger.debug("RSA keys parsed successfully");
 
         Map<String, Object> cnf = Map.of("jwk", publicJwk.toPublicJWK().toJSONObject());
 
         // Build enrollment JWT
+        logger.trace(
+                "Building enrollment JWT with claims - enrollmentId: {}, userId: {}, deviceType: ios, pushProviderType: {}",
+                enrollmentId,
+                userId,
+                pushProviderType != null && !pushProviderType.isEmpty() ? pushProviderType : "log");
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .claim("enrollmentId", enrollmentId)
                 .claim("nonce", nonce)
@@ -133,6 +151,7 @@ public class EnrollController {
                 .claim("credentialId", userId + "-device-alias-" + context)
                 .claim("cnf", cnf)
                 .build();
+        logger.debug("Enrollment JWT claims set created");
 
         JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256)
                 .keyID("DEVICE_KEY_ID")
@@ -142,8 +161,7 @@ public class EnrollController {
         SignedJWT signedJWT = new SignedJWT(header, claimsSet);
         signedJWT.sign(new RSASSASigner(privateJwk));
         String enrollmentToken = signedJWT.serialize();
-
-        logger.debug("Enrollment token generated successfully");
+        logger.debug("Enrollment token generated and signed successfully, token length: {}", enrollmentToken.length());
 
         Map<String, Object> body = Map.of("token", enrollmentToken);
 
@@ -155,15 +173,32 @@ public class EnrollController {
         List<MediaType> acceptList = new ArrayList<>();
         acceptList.add(MediaType.APPLICATION_JSON);
         headers.setAccept(acceptList);
+        logger.debug("Prepared HTTP headers for enrollment completion request");
 
         HttpEntity<String> entity = new HttpEntity<>(jsonBody, headers);
 
         Objects.requireNonNull(iamUrl, "iamUrl must not be null");
         Objects.requireNonNull(HttpMethod.POST, "httpMethod must not be null");
-        ResponseEntity<String> response =
-                restTemplate.exchange(iamUrl + "/push-mfa/enroll/complete", HttpMethod.POST, entity, String.class);
 
-        logger.info("Enrollment request sent to {}. Response status: {}", iamUrl, response.getStatusCode());
+        String enrollmentEndpoint = iamUrl + "/push-mfa/enroll/complete";
+        logger.info("Sending enrollment completion request to Keycloak endpoint: {}", enrollmentEndpoint);
+        logger.trace("Enrollment token being sent, length: {}", enrollmentToken.length());
+
+        ResponseEntity<String> response =
+                restTemplate.exchange(enrollmentEndpoint, HttpMethod.POST, entity, String.class);
+
+        logger.info("Enrollment completion response from Keycloak - status: {}", response.getStatusCode());
+        logger.debug(
+                "Response body length: {}",
+                response.getBody() != null ? response.getBody().length() : 0);
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            logger.warn(
+                    "Enrollment completion failed with status: {}, response: {}",
+                    response.getStatusCode(),
+                    response.getBody());
+        } else {
+            logger.info("Enrollment completion successful for userId: {}, enrollmentId: {}", userId, enrollmentId);
+        }
 
         return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
     }
