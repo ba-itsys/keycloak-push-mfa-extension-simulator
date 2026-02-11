@@ -155,11 +155,12 @@ public class ConfirmController {
                 logger.warn("Failed to obtain access token");
                 return ResponseEntity.status(401).body("Failed to obtain access token");
             }
-
+            String loginPendingUrl = iamUrl + LOGIN_PENDING_ENDPOINT;
             // Get pending challenges
             String pendingUrl =
-                    iamUrl + LOGIN_PENDING_ENDPOINT + "?userId=" + URLEncoder.encode(userId, StandardCharsets.UTF_8);
-            String pendingDpop = createDpopJwt(credentialId, "GET", pendingUrl, privateJwk);
+                    loginPendingUrl + "?userId=" + URLEncoder.encode(userId, StandardCharsets.UTF_8);
+            // RFC 9449: htu must exclude query and fragment parts (userId)
+            String pendingDpop = createDpopJwt(credentialId, "GET", loginPendingUrl, privateJwk);
             JsonNode pendingJson = getPendingChallenges(pendingUrl, pendingDpop, accessToken);
 
             if (pendingJson == null || !pendingJson.has("challenges")) {

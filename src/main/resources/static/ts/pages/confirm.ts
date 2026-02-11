@@ -144,11 +144,14 @@ onReady(() => {
       }
       const accessTokenJson = (await accessTokenResponse.json()) as Record<string, string>;
       const accessToken = accessTokenJson['access_token'];
+
       const pendingUrl = new URL(_iamUrl?.toString() + LOGIN_PENDING_ENDPOINT);
+      const pendingHtu = new URL(_iamUrl?.toString() + LOGIN_PENDING_ENDPOINT);
       pendingUrl.searchParams.set('userId', userId);
-      const pendingHtu = pendingUrl.toString();
-      const pendingDpop = await createDpopProof(credentialId, 'GET', pendingHtu);
-      const pendingResponse = await getPendingChallenges(pendingHtu, pendingDpop, accessToken);
+      
+      // RFC 9449: htu must exclude query and fragment parts
+      const pendingDpop = await createDpopProof(credentialId, 'GET', pendingHtu.toString());
+      const pendingResponse = await getPendingChallenges(pendingUrl.toString(), pendingDpop, accessToken);
       if (!pendingResponse.ok) {
         setMessage(messageEl, `${await pendingResponse.text()}`, 'error');
         return;
