@@ -12,8 +12,6 @@ import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.JWTParser;
 import com.nimbusds.jwt.SignedJWT;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -162,13 +160,13 @@ public class ConfirmController {
                 return ResponseEntity.status(401).body("Failed to obtain access token");
             }
             logger.info("Access token obtained successfully");
-            String loginPendingUrl = iamUrl + LOGIN_PENDING_ENDPOINT;
-            // Get pending challenges
-            String pendingUrl = loginPendingUrl + "?userId=" + URLEncoder.encode(userId, StandardCharsets.UTF_8);
-            logger.debug("Fetching pending challenges for userId: {}", userId);
+            String basePendingUrl = iamUrl + LOGIN_PENDING_ENDPOINT;
+  
+            String pendingUrl = basePendingUrl + "?userId=" + userId;
+            logger.debug("Fetching pending challenges for userId: {} (encoded: {})", userId, basePendingUrl);
             // RFC 9449: htu must exclude query and fragment parts (userId)
-            String pendingDpop = createDpopJwt(credentialId, "GET", loginPendingUrl, privateJwk);
-            logger.debug("DPoP JWT created for pending challenges endpoint: {}", loginPendingUrl);
+            String pendingDpop = createDpopJwt(credentialId, "GET", basePendingUrl, privateJwk);
+            logger.debug("DPoP JWT created for pending challenges endpoint: {}", basePendingUrl);
             JsonNode pendingJson = getPendingChallenges(pendingUrl, pendingDpop, accessToken);
 
             if (pendingJson == null || !pendingJson.has("challenges")) {
@@ -365,10 +363,10 @@ public class ConfirmController {
     }
 
     @SuppressWarnings("null")
-    private JsonNode getPendingChallenges(String url, String dPopToken, String accessToken) throws Exception {
+    JsonNode getPendingChallenges(String url, String dPopToken, String accessToken) throws Exception {
         logger.info("Fetching pending challenges from: {}", url);
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer (token)");
+        headers.set("Authorization", "Bearer " + accessToken);
         headers.set("DPoP", dPopToken);
         logger.trace("Prepared HTTP headers with Authorization and DPoP for pending challenges request");
 
@@ -426,7 +424,7 @@ public class ConfirmController {
         logger.debug("Posting challenge response to: {}", url);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer (token)");
+        headers.set("Authorization", "Bearer " + accessToken);
         headers.set("DPoP", dPopToken);
 
         ChallengeResponseRequest body = new ChallengeResponseRequest(challengeToken);
