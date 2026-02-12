@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.6.1](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.6.0...v1.6.1) (2026-02-12)
+
+
+### Bug Fixes
+
+* **challenge:** rm double encode url query param ([d5fe188](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/d5fe188a8a573c12a8cca37ceb4491dd4a2801a7))
+* CODEOWNERS ([a297096](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/a297096fdaafda9efd095318ecf254fff7d5275e))
+
 ## [1.6.0](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.5.1...v1.6.0) (2026-02-11)
 
 
