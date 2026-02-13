@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.6.2](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.6.1...v1.6.2) (2026-02-13)
+
+
+### Bug Fixes
+
+* add heartbeat to server sendevents ([#37](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/issues/37)) ([e7e1c1e](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/e7e1c1e01b187121696bb908260429dbb79723b8))
+* flaky server send events test ([d006043](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/d006043dca2192121e8dacb0f56a934caaef8d05))
+
 ## [1.6.1](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.6.0...v1.6.1) (2026-02-12)
 
 
