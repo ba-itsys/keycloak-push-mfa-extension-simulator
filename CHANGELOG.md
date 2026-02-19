@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.3](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.6.2...v1.6.3) (2026-02-19)
+
+
+### Bug Fixes
+
+* redirect to confirm page from push notification ([3d136f5](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/3d136f5bff78b3d98c2eaf61b33dd376ef8c3bbf))
+
 ## [1.6.2](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.6.1...v1.6.2) (2026-02-13)
 
 
