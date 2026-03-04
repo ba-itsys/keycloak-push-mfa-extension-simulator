@@ -12,12 +12,12 @@ onReady(() => {
   const contextEl = getById<HTMLInputElement>('context');
   const iamUrlEl = getById<HTMLInputElement>('iam-url');
   const providerTypeEl = getById<HTMLInputElement>('provider-type');
+  const callTypeEl = getById<HTMLSelectElement>('callType');
   const outEl = getById<HTMLInputElement>('out');
 
   // actions
   const createJwkBtn = getById<HTMLInputElement>('createJwkBtn');
   const enrollBtn = getById<HTMLInputElement>('enrollBtn');
-  const enrollBtnBackend = getById<HTMLInputElement>('enrollBtnBackend');
 
   tokenEl.value = qs.get('token') ?? '';
 
@@ -47,50 +47,8 @@ onReady(() => {
     await createNewKeyPair();
   });
 
-  enrollBtnBackend.addEventListener('click', async () => {
-    const _token = tokenEl.value.trim();
-    const _context = contextEl.value.trim();
-    let _iamUrl: string | URL = iamUrlEl.value.trim();
-    if (!_token) {
-      outEl.textContent = 'Please enter token.';
-      return;
-    }
-    if (_iamUrl) {
-      try {
-        _iamUrl = new URL(_iamUrl);
-      } catch (e) {
-        console.error('Error parsing IAM URL:', e);
-        outEl.textContent = 'Not a valid url.';
-        return;
-      }
-    }
-
-    outEl.textContent = 'Starting backend enrollment...';
-    try {
-      const formData = new FormData();
-      formData.append('token', _token);
-      if (_context) formData.append('context', _context);
-      formData.append('iamUrl', _iamUrl ? _iamUrl.toString() : 'http://localhost:8080/realms/demo');
-      formData.append('pushProviderType', providerTypeEl.value.trim() || 'log');
-
-      const response = await fetch('./enroll/complete', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const error = await response.text();
-        outEl.textContent = 'Error: ' + error;
-        return;
-      }
-      const data = await response.text();
-      outEl.textContent = data;
-    } catch (e) {
-      outEl.textContent = 'Error: ' + (e instanceof Error ? e.message : String(e));
-    }
-  });
-
   enrollBtn.addEventListener('click', async () => {
+    const callType = callTypeEl.value.trim();
     const _token = tokenEl.value.trim();
     const _context = contextEl.value.trim();
     let _iamUrl: string | URL = iamUrlEl.value.trim();
@@ -108,6 +66,38 @@ onReady(() => {
       }
     }
 
+    // Backend flow
+    if (callType === 'backend') {
+      outEl.textContent = 'Starting backend enrollment...';
+      try {
+        const formData = new FormData();
+        formData.append('token', _token);
+        if (_context) formData.append('context', _context);
+        formData.append(
+          'iamUrl',
+          _iamUrl ? _iamUrl.toString() : 'http://localhost:8080/realms/demo'
+        );
+        formData.append('pushProviderType', providerTypeEl.value.trim() || 'log');
+
+        const response = await fetch('./enroll/complete', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const error = await response.text();
+          outEl.textContent = 'Error: ' + error;
+          return;
+        }
+        const data = await response.text();
+        outEl.textContent = data;
+      } catch (e) {
+        outEl.textContent = 'Error: ' + (e instanceof Error ? e.message : String(e));
+      }
+      return;
+    }
+
+    // Frontend flow
     outEl.textContent = 'Starting enrollment...';
     try {
       const enrollmentValues = unpackEnrollmentToken(_token);
@@ -118,7 +108,7 @@ onReady(() => {
       const enrollmentJwt = await createEnrollmentJwt(
         enrollmentValues,
         _context,
-        providerTypeEl.value.trim()
+        providerTypeEl.value.trim() || 'log'
       );
       const keycloakResponse = await postEnrollComplete(enrollmentJwt, _iamUrl as URL, _token);
 

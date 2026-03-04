@@ -86,13 +86,13 @@
               <small class="form-text text-muted">e.g. http://localhost:8080/realms/demo</small>
               <small class="form-text text-muted">e.g. https://myapp.local/realms/demo</small>
             </div>
-            <div class="col-md-3 mb-3">
+            <div class="col-md-6 mb-3">
               <label for="context" class="form-label">
                 <b>Enter context [optional]:</b>
               </label>
               <input id="context" type="text" class="form-control" placeholder="e.g. deviceXY" />
             </div>
-            <div class="col-md-3 mb-3">
+            <div class="col-md-6 mb-3">
               <label for="provider-type" class="form-label">
                 <b>Select provider type [optional]:</b>
               </label>
@@ -101,39 +101,29 @@
                 <option value="fcm">fcm</option>
               </select>
             </div>
+            <div class="col-md-6 mb-3">
+              <label for="callType" class="form-label">
+                <b>Call Type:</b>
+              </label>
+              <select id="callType" class="form-control">
+                <option value="backend" selected>Backend</option>
+                <option value="frontend">Frontend</option>
+              </select>
+            </div>
           </div>
 
-          <div class="mb-3">
-            <label class="form-label">
-              <b>Actions:</b>
-            </label>
-            <div class="mb-4">
-              <button id="enrollBtn" class="btn btn-primary me-2">Enroll Frontend</button>
-              <br /><small class="text-muted"
-                >Does only works if mock is deployed on same host (CORS)!</small
-              >
-              <br /><small class="text-muted"
-                >rsa-jwk.json must be placed in the mock's key folder! (static/keys)</small
-              >
-              <br /><small class="text-muted"
-                >Simulates the frontend enrollment process for Push-MFA, handling device
-                registration on the client side.</small
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <button id="enrollBtn" class="btn btn-primary w-100">Enroll</button>
+              <small class="text-muted d-block mt-2"
+                >Simulates the enrollment process for Push-MFA (frontend: CORS-dependent, backend:
+                direct call).</small
               >
             </div>
-            <div class="mb-4">
-              <button id="enrollBtnBackend" class="btn btn-primary me-2">Enroll Backend</button>
-              <br /><small class="text-muted"
-                >* Simulates the backend enrollment process for Push-MFA, processing the enrollment
-                on the server side.</small
-              >
-            </div>
-            <div>
-              <button id="createJwkBtn" class="btn btn-secondary">
-                Generate JWK (for signing the response)
-              </button>
-              <br /><small class="text-muted"
-                >Generates a JWK key pair for signing the enrollment response, ensuring
-                cryptographic integrity.</small
+            <div class="col-md-4 mb-3">
+              <button id="createJwkBtn" class="btn btn-secondary w-100">Generate JWK</button>
+              <small class="text-muted d-block mt-2"
+                >Generate a JWK key pair for signing the enrollment response.</small
               >
             </div>
           </div>
