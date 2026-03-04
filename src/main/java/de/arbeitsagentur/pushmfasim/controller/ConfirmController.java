@@ -14,6 +14,7 @@ import com.nimbusds.jwt.JWTParser;
 import com.nimbusds.jwt.SignedJWT;
 import java.util.Map;
 import java.util.UUID;
+import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -84,7 +85,7 @@ public class ConfirmController {
 
         logger.info("Starting confirm login process");
 
-        if (iamUrl == null || iamUrl.isEmpty()) {
+        if (ObjectUtils.isEmpty(iamUrl)) {
             iamUrl = defaultIamUrl;
         }
         logger.debug("Using IAM URL: {}", iamUrl);
@@ -128,14 +129,10 @@ public class ConfirmController {
 
             // Versuche zuerst vom Dateisystem zu laden (für K8s-Deployment mit volumeMount)
             Resource jwkResource;
-            try {
-                jwkResource = new FileSystemResource(jwkPath);
-                if (!jwkResource.exists()) {
-                    // Fallback auf Classpath für lokale Entwicklung
-                    jwkResource = new ClassPathResource("static/keys/rsa-jwk.json");
-                }
-            } catch (Exception e) {
-                // Fallback auf Classpath
+
+            jwkResource = new FileSystemResource(jwkPath);
+            if (!jwkResource.exists()) {
+                // Fallback auf Classpath für lokale Entwicklung
                 jwkResource = new ClassPathResource("static/keys/rsa-jwk.json");
             }
 
@@ -286,12 +283,9 @@ public class ConfirmController {
             ObjectMapper objectMapper = new ObjectMapper();
 
             Resource jwkResource;
-            try {
-                jwkResource = new FileSystemResource(jwkPath);
-                if (!jwkResource.exists()) {
-                    jwkResource = new ClassPathResource("static/keys/rsa-jwk.json");
-                }
-            } catch (Exception e) {
+
+            jwkResource = new FileSystemResource(jwkPath);
+            if (!jwkResource.exists()) {
                 jwkResource = new ClassPathResource("static/keys/rsa-jwk.json");
             }
 
@@ -308,7 +302,7 @@ public class ConfirmController {
             String dPopAccessTokenJwt = createDpopJwt(credentialId, "POST", tokenEndpointUrl, privateJwk);
             String accessToken = getAccessToken(iamUrl, dPopAccessTokenJwt);
 
-            if (accessToken == null || accessToken.isEmpty()) {
+            if (ObjectUtils.isEmpty(accessToken)) {
                 logger.warn("Failed to obtain access token for lockout");
                 return ResponseEntity.status(401).body("Failed to obtain access token");
             }
