@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.7.0](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.6.3...v1.7.0) (2026-03-04)
+
+
+### Features
+
+* **confirm:** add deny as an option ([6c420ad](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/6c420ad6ced9ee4b7a6a067abae2d59dde934857))
+* **enroll:** align layout with call type ([f12d287](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/f12d2878ccbf9aad015abd8a112d31415ce6014e))
+
+
+### Bug Fixes
+
+* review cleanup ([f166539](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/f166539944a399a48bbe599a7b66559bba3bced3))
+
 ## [1.6.3](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.6.2...v1.6.3) (2026-02-19)
 
 
