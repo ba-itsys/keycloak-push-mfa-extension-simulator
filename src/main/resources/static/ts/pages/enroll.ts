@@ -31,7 +31,7 @@ onReady(() => {
           iamUrlEl.value = enrollmentValues.iss;
         }
       } catch (e) {
-        // Silently ignore token parsing errors
+        console.error('Error parsing token for issuer:', e);
       }
     }
   };
@@ -59,6 +59,7 @@ onReady(() => {
       try {
         _iamUrl = new URL(_iamUrl);
       } catch (e) {
+        console.error('Error parsing IAM URL:', e);
         outEl.textContent = 'Not a valid url.';
         return;
       }
@@ -101,6 +102,7 @@ onReady(() => {
       try {
         _iamUrl = new URL(_iamUrl);
       } catch (e) {
+        console.error('Error parsing IAM URL:', e);
         outEl.textContent = 'Not a valid url.';
         return;
       }

@@ -36,7 +36,7 @@ public class FirebaseController {
     @Autowired
     private SseService sseService;
 
-    @PostMapping(path = "/fcm/token")
+    @PostMapping(value = "/fcm/token")
     public ResponseEntity<FcmTokenResponse> getToken(@RequestParam("assertion") String assertion) {
         LOG.info("FCM token request received");
         LOG.debug("Assertion parameter provided: {}", assertion != null && !assertion.isEmpty());
@@ -54,7 +54,7 @@ public class FirebaseController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping(path = "/fcm/messages:send")
+    @PostMapping(value = "/fcm/messages:send")
     public ResponseEntity<FcmMessageResponse> sendMessage(
             @RequestHeader("Authorization") String authorization, @RequestBody FcmMessageRequest request) {
         LOG.info("FCM message send request received");

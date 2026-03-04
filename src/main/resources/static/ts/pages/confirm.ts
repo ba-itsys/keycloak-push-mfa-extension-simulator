@@ -20,10 +20,11 @@ onReady(() => {
 
   const tokenEl = getById<HTMLInputElement>('token');
   const confirmBtnEl = getById<HTMLFormElement>('confirmBtn');
-  const confirmBtnBackendEl = getById<HTMLFormElement>('confirmBtnBackend');
+  const denyBtnEl = getById<HTMLFormElement>('denyBtn');
+  const denyWithLockoutBtnEl = getById<HTMLFormElement>('denyWithLockoutBtn');
+  const callTypeEl = getById<HTMLSelectElement>('callType');
   const iamUrlEl = getById<HTMLInputElement>('iam-url');
   const messageEl = getById<HTMLElement>('message');
-  const actionEl = getById<HTMLSelectElement>('action');
   const contextEl = getById<HTMLInputElement>('context');
   const userVerificationEl = getById<HTMLInputElement>('userVerification');
 
@@ -41,6 +42,7 @@ onReady(() => {
           iamUrlEl.value = confirmTokenValues.iss;
         }
       } catch (e) {
+        console.error('Error extracting issuer from token:', e);
         // Silently ignore token parsing errors
       }
     }
@@ -52,32 +54,60 @@ onReady(() => {
   tokenEl.addEventListener('change', updateIamUrlFromToken);
   tokenEl.addEventListener('input', updateIamUrlFromToken);
 
-  confirmBtnBackendEl.addEventListener('click', async (_e) => {
+  // Unified handler for all three actions
+  const handleAction = async (action: 'approve' | 'deny' | 'deny-lockout') => {
+    const callType = callTypeEl.value.trim();
     const _token = tokenEl.value.trim();
     const _context = contextEl.value.trim();
     let _iamUrl: string | URL = iamUrlEl.value.trim();
+    const _userVerification = userVerificationEl.value.trim();
+
     if (!_token) {
       setMessage(messageEl, 'token required...', 'error');
       return;
     }
+
     if (_iamUrl) {
       try {
         _iamUrl = new URL(_iamUrl);
       } catch (e) {
+        console.error('Error parsing IAM URL:', e);
         setMessage(messageEl, 'Not a valid url...', 'error');
         return;
       }
     }
 
-    setMessage(messageEl, 'Starting backend enrollment...');
+    // Backend flow
+    if (callType === 'backend') {
+      await handleBackendAction(action, _token, _context, _iamUrl);
+      return;
+    }
+
+    // Frontend flow
+    await handleFrontendAction(action, _token, _context, _userVerification, _iamUrl);
+  };
+
+  const handleBackendAction = async (
+    action: 'approve' | 'deny' | 'deny-lockout',
+    token: string,
+    context: string,
+    iamUrl: string | URL
+  ) => {
+    setMessage(messageEl, 'Starting backend action...');
 
     try {
       const formData = new FormData();
-      formData.append('token', _token);
-      if (_context) formData.append('context', _context);
-      formData.append('iamUrl', _iamUrl ? _iamUrl.toString() : 'http://localhost:8080/realms/demo');
+      formData.append('token', token);
+      if (context) formData.append('context', context);
+      formData.append('iamUrl', iamUrl ? iamUrl.toString() : 'http://localhost:8080/realms/demo');
 
-      const response = await fetch('./confirm/login', {
+      // Include action parameter for backend to handle different response types
+      formData.append('action', action);
+
+      // choose endpoint path based on lockout
+      const endpoint = action === 'deny-lockout' ? './confirm/lockout' : './confirm/challenge';
+
+      const response = await fetch(endpoint, {
         method: 'POST',
         body: formData,
       });
@@ -92,34 +122,30 @@ onReady(() => {
     } catch (e) {
       setMessage(messageEl, e instanceof Error ? e.message : String(e), 'error');
     }
-  });
+  };
 
-  confirmBtnEl.addEventListener('click', async (e) => {
-    e.preventDefault();
+  const handleFrontendAction = async (
+    action: 'approve' | 'deny' | 'deny-lockout',
+    token: string,
+    context: string,
+    userVerification: string,
+    iamUrl: string | URL
+  ) => {
     setMessage(messageEl, 'Logging in...', 'info');
 
     try {
-      const _action = actionEl.value.trim();
-      const _token = tokenEl.value.trim();
-      const _context = contextEl.value.trim();
-      const _userVerification = userVerificationEl.value.trim();
-      const _iamUrl: string | URL = iamUrlEl.value.trim();
-
-      if (!_token) {
-        setMessage(messageEl, 'token required...', 'error');
-        return;
-      }
-      const confirmValues = unpackLoginConfirmToken(_token);
+      const confirmValues = unpackLoginConfirmToken(token);
       if (confirmValues === null) {
         setMessage(messageEl, 'invalid confirm token payload...', 'error');
         return;
       }
-      const effectiveAction = (_action ?? 'approve').trim().toLowerCase();
+
+      const effectiveAction = (action === 'deny-lockout' ? 'deny' : action).trim().toLowerCase();
       const tokenUserVerification = confirmValues.userVerification;
       const effectiveUserVerification = firstNonBlank(
-        _userVerification,
+        userVerification,
         tokenUserVerification,
-        _context
+        context
       );
 
       const credentialId = confirmValues.credId;
@@ -134,9 +160,9 @@ onReady(() => {
       const dPopAccessToken = await createDpopProof(
         credentialId,
         'POST',
-        _iamUrl?.toString() + TOKEN_ENDPOINT
+        iamUrl?.toString() + TOKEN_ENDPOINT
       );
-      const accessTokenResponse = await postAccessToken(_iamUrl, dPopAccessToken);
+      const accessTokenResponse = await postAccessToken(iamUrl?.toString(), dPopAccessToken);
 
       if (!accessTokenResponse.ok) {
         setMessage(messageEl, `${await accessTokenResponse.text()}`, 'error');
@@ -145,8 +171,8 @@ onReady(() => {
       const accessTokenJson = (await accessTokenResponse.json()) as Record<string, string>;
       const accessToken = accessTokenJson['access_token'];
 
-      const pendingUrl = new URL(_iamUrl?.toString() + LOGIN_PENDING_ENDPOINT);
-      const pendingHtu = new URL(_iamUrl?.toString() + LOGIN_PENDING_ENDPOINT);
+      const pendingUrl = new URL(iamUrl?.toString() + LOGIN_PENDING_ENDPOINT);
+      const pendingHtu = new URL(iamUrl?.toString() + LOGIN_PENDING_ENDPOINT);
       pendingUrl.searchParams.set('userId', userId);
 
       // RFC 9449: htu must exclude query and fragment parts
@@ -175,7 +201,7 @@ onReady(() => {
         setMessage(messageEl, `userVerification required ...`, 'error');
         return;
       }
-      const url = _iamUrl + CHALLENGE_ENDPOINT.replace(CHALLENGE_ID, challengeId);
+      const url = iamUrl + CHALLENGE_ENDPOINT.replace(CHALLENGE_ID, challengeId);
       const dpopChallengeToken = await createDpopProof(credentialId, 'POST', url);
       const challengeToken = await createChallengeToken(
         credentialId,
@@ -198,13 +224,30 @@ onReady(() => {
 
       setMessage(
         messageEl,
-        `userId: ${userId}; responseStatus: ${challengeResponse.status}; userVerification: ${pendingUserVerification}; `,
+        `action: ${action}; userId: ${userId}; responseStatus: ${challengeResponse.status}; userVerification: ${pendingUserVerification}; `,
         'success'
       );
     } catch (e) {
       setMessage(messageEl, 'Error: ' + (e instanceof Error ? e.message : String(e)), 'error');
     }
+  };
+
+  // Add event listeners for all three buttons
+  confirmBtnEl.addEventListener('click', async (e) => {
+    e.preventDefault();
+    await handleAction('approve');
   });
+
+  denyBtnEl.addEventListener('click', async (e) => {
+    e.preventDefault();
+    await handleAction('deny');
+  });
+
+  denyWithLockoutBtnEl.addEventListener('click', async (e) => {
+    e.preventDefault();
+    await handleAction('deny-lockout');
+  });
+
   initializeSseListener();
 });
 

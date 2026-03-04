@@ -59,32 +59,32 @@
               />
             </div>
             <div class="col-md-6 mb-3">
-              <label for="userVerification" class="form-label">
-                <b>Login action:</b>
+              <label for="callType" class="form-label">
+                <b>Call Type:</b>
               </label>
-              <select id="action" class="form-control">
-                <option value="approve" selected>approve</option>
-                <option value="deny">deny</option>
+              <select id="callType" class="form-control">
+                <option value="frontend" selected>Frontend</option>
+                <option value="backend">Backend</option>
               </select>
             </div>
           </div>
-          <div class="mb-4">
-            <button id="confirmBtn" class="btn btn-primary me-2">Confirm Frontend</button>
-            <br /><small class="text-muted"
-              >Does only works if mock is deployed on same host (CORS)!</small
-            >
-            <br /><small class="text-muted"
-              >rsa-jwk.json must be placed in the mock's key folder! (static/keys)</small
-            >
-            <br /><small class="text-muted"
-              >Simulates the frontend login confirm for Push-MFA.</small
-            >
-          </div>
-          <div class="mb-4">
-            <button id="confirmBtnBackend" class="btn btn-primary me-2">Confirm Backend</button>
-            <br /><small class="text-muted"
-              >* Simulates the backend login confirm process for Push-MFA.</small
-            >
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <button id="confirmBtn" class="btn btn-primary w-100">Confirm</button>
+              <small class="text-muted d-block mt-2"
+                >Approve the login request (frontend: CORS-dependent, backend: direct call).</small
+              >
+            </div>
+            <div class="col-md-4 mb-3">
+              <button id="denyBtn" class="btn btn-warning w-100">Deny</button>
+              <small class="text-muted d-block mt-2">Deny the login request.</small>
+            </div>
+            <div class="col-md-4 mb-3">
+              <button id="denyWithLockoutBtn" class="btn btn-danger w-100">
+                Deny with Lockout
+              </button>
+              <small class="text-muted d-block mt-2">Deny the request and lock the account.</small>
+            </div>
           </div>
         </div>
         <div class="card mb-4">

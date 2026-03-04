@@ -59,7 +59,7 @@ public class EnrollController {
     }
 
     @SuppressWarnings("null")
-    @PostMapping(path = "/complete")
+    @PostMapping(value = "/complete")
     @ResponseBody
     public ResponseEntity<String> completeEnrollProcess(
             @RequestParam String token,

@@ -64,13 +64,14 @@ public class ConfirmController {
     private static final String DEVICE_STATIC_ID = "device-static-id";
     private static final String TOKEN_ENDPOINT = "/protocol/openid-connect/token";
     private static final String LOGIN_PENDING_ENDPOINT = "/push-mfa/login/pending";
+    private static final String LOGIN_LOCKOUT_ENDPOINT = "/push-mfa/login/lockout";
 
     @GetMapping
     public String showInfoPage() {
         return "confirm-page";
     }
 
-    @PostMapping(path = "/login")
+    @PostMapping(value = "/challenge")
     @ResponseBody
     @SuppressWarnings("null")
     public ResponseEntity<String> completeEnrollProcess(
@@ -161,7 +162,7 @@ public class ConfirmController {
             }
             logger.info("Access token obtained successfully");
             String basePendingUrl = iamUrl + LOGIN_PENDING_ENDPOINT;
-  
+
             String pendingUrl = basePendingUrl + "?userId=" + userId;
             logger.debug("Fetching pending challenges for userId: {} (encoded: {})", userId, basePendingUrl);
             // RFC 9449: htu must exclude query and fragment parts (userId)
@@ -235,6 +236,106 @@ public class ConfirmController {
 
         } catch (Exception e) {
             logger.error("Error during confirm login process", e);
+            return ResponseEntity.status(500).body("Error: " + e.getMessage());
+        }
+    }
+
+    /*
+     * Endpoint that locks out a user account on Keycloak.
+     * The device sends a DPoP-authenticated request to disable the user account,
+     * acting as a panic button if the account is compromised.
+     */
+    @PostMapping(value = "/lockout")
+    @ResponseBody
+    @SuppressWarnings("null")
+    public ResponseEntity<String> loginLockout(
+            @RequestParam String token,
+            @RequestParam(required = false) String context,
+            @RequestParam(required = false) String userVerification,
+            @RequestParam(required = false) String iamUrl)
+            throws Exception {
+
+        logger.info("Starting user lockout process");
+
+        if (iamUrl == null || iamUrl.isEmpty()) {
+            iamUrl = defaultIamUrl;
+        }
+        logger.debug("Using IAM URL: {}", iamUrl);
+
+        // Parse and validate token
+        JWT jwt = JWTParser.parse(token);
+        JWTClaimsSet claims = jwt.getJWTClaimsSet();
+
+        String credentialId = claims.getClaims().containsKey("credId") ? claims.getStringClaim("credId") : null;
+
+        if (credentialId == null) {
+            logger.warn("Invalid token: missing credentialId");
+            return ResponseEntity.badRequest().body("Invalid token: missing credentialId");
+        }
+
+        // Extract userId from credentialId
+        String userId = extractUserIdFromCredentialId(credentialId);
+        if (userId == null) {
+            logger.warn("Unable to extract user id from credential id");
+            return ResponseEntity.badRequest().body("Unable to extract user id from credential id");
+        }
+        logger.debug("Successfully extracted userId: {} from credentialId", userId);
+
+        try {
+            // Load JWK keys
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            Resource jwkResource;
+            try {
+                jwkResource = new FileSystemResource(jwkPath);
+                if (!jwkResource.exists()) {
+                    jwkResource = new ClassPathResource("static/keys/rsa-jwk.json");
+                }
+            } catch (Exception e) {
+                jwkResource = new ClassPathResource("static/keys/rsa-jwk.json");
+            }
+
+            JsonNode root = objectMapper.readTree(jwkResource.getInputStream());
+            JsonNode privateNode = root.get("private");
+
+            Map<String, Object> privateMap =
+                    objectMapper.convertValue(privateNode, new TypeReference<Map<String, Object>>() {});
+            RSAKey privateJwk = RSAKey.parse(privateMap);
+            logger.debug("Private JWK loaded successfully");
+
+            // Create DPoP JWT for token endpoint
+            String tokenEndpointUrl = iamUrl + TOKEN_ENDPOINT;
+            String dPopAccessTokenJwt = createDpopJwt(credentialId, "POST", tokenEndpointUrl, privateJwk);
+            String accessToken = getAccessToken(iamUrl, dPopAccessTokenJwt);
+
+            if (accessToken == null || accessToken.isEmpty()) {
+                logger.warn("Failed to obtain access token for lockout");
+                return ResponseEntity.status(401).body("Failed to obtain access token");
+            }
+            logger.info("Access token obtained successfully for lockout");
+
+            // Create DPoP JWT for lockout endpoint
+            String lockoutEndpoint = iamUrl + LOGIN_LOCKOUT_ENDPOINT;
+            logger.debug("Creating DPoP JWT for lockout endpoint: {}", lockoutEndpoint);
+            String dpopLockoutToken = createDpopJwt(credentialId, "POST", lockoutEndpoint, privateJwk);
+
+            logger.info("Posting lockout request for userId: {}", userId);
+            ResponseEntity<String> lockoutResponse = postLockout(lockoutEndpoint, dpopLockoutToken, accessToken);
+
+            if (!lockoutResponse.getStatusCode().is2xxSuccessful()) {
+                logger.warn("Lockout request failed: {}", lockoutResponse.getStatusCode());
+                return ResponseEntity.status(lockoutResponse.getStatusCode())
+                        .body("Lockout failed: " + lockoutResponse.getStatusCode());
+            }
+
+            String responseMsg = String.format(
+                    "userId: %s; lockout status: %s; account disabled", userId, lockoutResponse.getStatusCode());
+
+            logger.info("User lockout completed successfully: {}", responseMsg);
+            return ResponseEntity.ok(responseMsg);
+
+        } catch (Exception e) {
+            logger.error("Error during lockout process", e);
             return ResponseEntity.status(500).body("Error: " + e.getMessage());
         }
     }
@@ -443,6 +544,27 @@ public class ConfirmController {
         } catch (Exception e) {
             logger.error("Failed to post challenge response to {}", url, e);
             return ResponseEntity.status(500).body("Failed to post challenge response: " + e.getMessage());
+        }
+    }
+
+    @SuppressWarnings("null")
+    private ResponseEntity<String> postLockout(String url, String dPopToken, String accessToken) throws Exception {
+        logger.debug("Posting lockout request to: {}", url);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "DPoP " + accessToken);
+        headers.set("DPoP", dPopToken);
+
+        HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+        try {
+            logger.trace("Sending POST request to lockout endpoint");
+            @SuppressWarnings("null")
+            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+            logger.info("Lockout request posted successfully to {}, status: {}", url, response.getStatusCode());
+            return response != null ? response : ResponseEntity.status(500).body("No response from server");
+        } catch (Exception e) {
+            logger.error("Failed to post lockout request to {}", url, e);
+            return ResponseEntity.status(500).body("Failed to post lockout request: " + e.getMessage());
         }
     }
 
