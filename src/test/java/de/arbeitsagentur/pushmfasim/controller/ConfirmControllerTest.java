@@ -319,6 +319,14 @@ class ConfirmControllerTest {
     }
 
     @Test
+    @DisplayName("Lockout endpoint should forward to existing process and throw on empty token")
+    void testLoginLockoutThrowsOnEmptyToken() throws Exception {
+        assertThrows(Exception.class, () -> {
+            confirmController.loginLockout("", "ctx", null, "http://localhost:8080/realms/demo");
+        });
+    }
+
+    @Test
     @DisplayName("Should handle special characters in userId")
     void testHandleSpecialCharactersInUserId() throws Exception {
         String userId = "user-with-special_chars@example.com";
