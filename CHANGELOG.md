@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.1](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.7.0...v1.7.1) (2026-03-10)
+
+
+### Dependencies
+
+* upgrade Spring Boot to 4.0.3 ([1e6b84c](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/1e6b84cc20132d5f00a03fae66966e5b2f332db0))
+
 ## [1.7.0](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.6.3...v1.7.0) (2026-03-04)
 
 
