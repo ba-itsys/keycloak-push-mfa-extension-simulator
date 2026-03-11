@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.2](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.7.1...v1.7.2) (2026-03-11)
+
+
+### Bug Fixes
+
+* basepath for resources ([dd496a0](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/dd496a0043cb207774d69fff775f7b90443286d8))
+
 ## [1.7.1](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.7.0...v1.7.1) (2026-03-10)
 
 
