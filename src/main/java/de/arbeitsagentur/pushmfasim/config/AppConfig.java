@@ -15,13 +15,15 @@ public class AppConfig {
             @Autowired SpringTemplateEngine templateEngine,
             @Value("${app.basepath}") String basePath,
             @Value("${app.clientId}") String clientId,
-            @Value("${app.clientSecret}") String clientSecret) {
+            @Value("${app.clientSecret}") String clientSecret,
+            @Value("${app.sseFlag}") String sseFlag) {
         ThymeleafViewResolver thymeleafViewResolver = new ThymeleafViewResolver();
         thymeleafViewResolver.setTemplateEngine(templateEngine);
         thymeleafViewResolver.setCharacterEncoding("UTF-8");
         thymeleafViewResolver.addStaticVariable("basepath", basePath);
         thymeleafViewResolver.addStaticVariable("clientId", clientId);
         thymeleafViewResolver.addStaticVariable("clientSecret", clientSecret);
+        thymeleafViewResolver.addStaticVariable("sseFlag", sseFlag);
         return thymeleafViewResolver;
     }
 }

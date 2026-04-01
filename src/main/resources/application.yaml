@@ -16,6 +16,8 @@ app:
   # Default client credentials for device client defined in keycloak
   clientId: 'push-device-client'
   clientSecret: 'device-client-secret'
+  # Flag to disable SSE e.g. for last testing purposes
+  sseFlag: 'enabled'
 
 server:
   port: 5000

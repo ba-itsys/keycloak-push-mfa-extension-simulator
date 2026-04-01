@@ -14,19 +14,23 @@ export type FcmMessage = {
 };
 
 export function initializeSseListener(): void {
-  sseEmitter = new EventSource('./fcm/register-sse', {
-    withCredentials: true,
-  });
-  sseEmitter.onopen = function () {
-    console.log('SSE connection opened.');
-  };
-  sseEmitter.onerror = function (error) {
-    console.error('SSE error:', error);
-  };
-  sseEmitter.addEventListener('fcm-message', handleMessage);
-  sseEmitter.addEventListener('heartbeat', function () {
-    console.debug('SSE heartbeat received');
-  });
+  if (window.ENV.sseFlag === "enabled") {  
+    sseEmitter = new EventSource('./fcm/register-sse', {
+      withCredentials: true,
+    });
+    sseEmitter.onopen = function () {
+      console.log('SSE connection opened.');
+    };
+    sseEmitter.onerror = function (error) {
+      console.error('SSE error:', error);
+    };
+    sseEmitter.addEventListener('fcm-message', handleMessage);
+    sseEmitter.addEventListener('heartbeat', function () {
+      console.debug('SSE heartbeat received');
+    });
+  } else {
+    console.debug('SSE is disabled. No connection will be established.');
+  }
 }
 
 const handleMessage = (event: MessageEvent) => {
