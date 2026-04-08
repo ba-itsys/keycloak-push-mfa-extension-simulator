@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.8.1](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.8.0...v1.8.1) (2026-04-08)
+
+
+### Dependencies
+
+* **deps-dev:** bump @typescript-eslint/eslint-plugin ([5e6086c](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/5e6086c9ad899bb6bc39eac8ca987a6fff5ddb33))
+* **deps-dev:** bump com.diffplug.spotless:spotless-maven-plugin ([14b43b9](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/14b43b96e51accdd518dc35dd1868f9fa65ffd71))
+* **deps-dev:** bump esbuild from 0.27.1 to 0.28.0 ([18db3f0](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/18db3f0006b7b5be3b6b3c29620c4ef3d9bc937f))
+* **deps-dev:** bump prettier from 3.2.5 to 3.8.1 ([#69](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/issues/69)) ([d5e68ff](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/d5e68ff28625b27687a975554c20d0c484542737))
+* **deps:** bump com.nimbusds:nimbus-jose-jwt from 9.41.2 to 10.9 ([4a903d2](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/4a903d258e343d9de1167ad8d8ccaa0989ef7d78))
+* **deps:** bump commons-validator:commons-validator ([4ee9e02](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/4ee9e026f213b5ab18804bcc761c45dba95ddebc))
+* **deps:** bump org.projectlombok:lombok from 1.18.42 to 1.18.44 ([e19d342](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/e19d3425ea67ca8016cef3bb0f3387870d1a6317))
+* **deps:** bump org.springframework.boot:spring-boot-starter-parent ([1e7602e](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/1e7602e554d232c9672bdcfc860cb0d185aa0ca6))
+
 ## [1.8.0](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.7.2...v1.8.0) (2026-04-01)
 
 
