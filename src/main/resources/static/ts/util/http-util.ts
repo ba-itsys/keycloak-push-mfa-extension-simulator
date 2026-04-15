@@ -1,11 +1,17 @@
 import { ENROLL_COMPLETE, TOKEN_ENDPOINT } from './urls.js';
 
-export async function postEnrollComplete(enrollReplyToken: string, url?: URL, authToken?: string) {
+export async function postEnrollComplete(
+  enrollReplyToken: string,
+  url?: URL,
+  authToken?: string,
+  dpop?: string
+) {
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
   };
   if (authToken) {
-    headers['Authorization'] = `Bearer ${authToken}`;
+    headers['Authorization'] = `DPoP ${authToken}`;
+    headers['DPoP'] = dpop ?? '';
   }
 
   return await post(
