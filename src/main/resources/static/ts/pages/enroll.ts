@@ -1,8 +1,15 @@
 import { getById, onReady } from '../shared.js';
 import { createNewKeyPair } from '../util/keys-util.js';
-import { createEnrollmentJwt, unpackEnrollmentToken } from '../util/token-util.js';
+import {
+  getCredentialId,
+  createEnrollmentJwt,
+  unpackEnrollmentToken,
+  requestDpopAccessToken,
+  createDpopProof,
+} from '../util/token-util.js';
 import { postEnrollComplete } from '../util/http-util.js';
 import { initializeSseListener } from '../util/sse-util.js';
+import { ENROLL_COMPLETE } from '../util/urls.js';
 
 onReady(() => {
   const qs = new URLSearchParams(location.search);
@@ -13,6 +20,7 @@ onReady(() => {
   const iamUrlEl = getById<HTMLInputElement>('iam-url');
   const providerTypeEl = getById<HTMLInputElement>('provider-type');
   const callTypeEl = getById<HTMLSelectElement>('callType');
+  const dpopEl = getById<HTMLInputElement>('dpop');
   const outEl = getById<HTMLInputElement>('out');
 
   // actions
@@ -110,7 +118,23 @@ onReady(() => {
         _context,
         providerTypeEl.value.trim() || 'log'
       );
-      const keycloakResponse = await postEnrollComplete(enrollmentJwt, _iamUrl as URL, _token);
+      let accessToken = undefined;
+      let dPop = undefined;
+      if (dpopEl.checked) {
+        const credentialId = getCredentialId(enrollmentValues.userId, _context);
+        accessToken = await requestDpopAccessToken(credentialId, _iamUrl.toString());
+        if (!accessToken) {
+          outEl.textContent = 'Failed to obtain DPoP access token.';
+          return;
+        }
+        dPop = await createDpopProof(credentialId, 'POST', _iamUrl.toString() + ENROLL_COMPLETE);
+      }
+      const keycloakResponse = await postEnrollComplete(
+        enrollmentJwt,
+        _iamUrl as URL,
+        accessToken,
+        dPop
+      );
 
       if (!keycloakResponse.ok) {
         const keycloakError = await keycloakResponse.text();

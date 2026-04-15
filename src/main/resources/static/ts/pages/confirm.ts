@@ -4,13 +4,10 @@ import {
   extractUserIdFromCredentialId,
   createChallengeToken,
   createDpopProof,
+  requestDpopAccessToken,
 } from '../util/token-util.js';
-import { TOKEN_ENDPOINT, LOGIN_PENDING_ENDPOINT, CHALLENGE_ENDPOINT } from '../util/urls.js';
-import {
-  postAccessToken,
-  getPendingChallenges,
-  postChallengesResponse,
-} from '../util/http-util.js';
+import { LOGIN_PENDING_ENDPOINT, CHALLENGE_ENDPOINT } from '../util/urls.js';
+import { getPendingChallenges, postChallengesResponse } from '../util/http-util.js';
 import { initializeSseListener } from '../util/sse-util.js';
 
 const CHALLENGE_ID = 'CHALLENGE_ID';
@@ -156,20 +153,11 @@ onReady(() => {
         setMessage(messageEl, 'unable to extract user id from credential id...', 'error');
         return;
       }
-
-      const dPopAccessToken = await createDpopProof(
-        credentialId,
-        'POST',
-        iamUrl?.toString() + TOKEN_ENDPOINT
-      );
-      const accessTokenResponse = await postAccessToken(iamUrl?.toString(), dPopAccessToken);
-
-      if (!accessTokenResponse.ok) {
-        setMessage(messageEl, `${await accessTokenResponse.text()}`, 'error');
+      const accessToken = await requestDpopAccessToken(credentialId, iamUrl?.toString());
+      if (!accessToken) {
+        setMessage(messageEl, 'Failed to obtain DPoP access token...', 'error');
         return;
       }
-      const accessTokenJson = (await accessTokenResponse.json()) as Record<string, string>;
-      const accessToken = accessTokenJson['access_token'];
 
       const pendingUrl = new URL(iamUrl?.toString() + LOGIN_PENDING_ENDPOINT);
       const pendingHtu = new URL(iamUrl?.toString() + LOGIN_PENDING_ENDPOINT);

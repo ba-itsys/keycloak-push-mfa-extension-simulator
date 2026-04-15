@@ -1,6 +1,8 @@
 import { decodeJwt, importJWK, JWTHeaderParameters, JWTPayload, SignJWT } from 'jose';
 import type { JWK, KeyLike } from 'jose';
 import { v4 as uuidv4 } from 'uuid';
+import { TOKEN_ENDPOINT } from './urls';
+import { postAccessToken } from './http-util';
 
 const DPOP_HEADER_TYPE = 'dpop+jwt';
 const JWT_HEADER_TYPE = 'JWT';
@@ -247,4 +249,19 @@ async function signJwt(
     .setProtectedHeader(protectedHeader)
     .setExpirationTime(exp)
     .sign(privateKey);
+}
+
+export async function requestDpopAccessToken(credentialId: string, iamUrl: string) {
+  const dPopAccessToken = await createDpopProof(
+    credentialId,
+    'POST',
+    iamUrl?.toString() + TOKEN_ENDPOINT
+  );
+  const accessTokenResponse = await postAccessToken(iamUrl?.toString(), dPopAccessToken);
+
+  if (!accessTokenResponse.ok) {
+    return undefined;
+  }
+  const accessTokenJson = (await accessTokenResponse.json()) as Record<string, string>;
+  return accessTokenJson['access_token'];
 }
