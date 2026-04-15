@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.0](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.8.1...v1.9.0) (2026-04-15)
+
+
+### Features
+
+* optional DPoP on Frontend Enrollment ([71e3b07](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/71e3b079103e50867d2ed70ee6c34a8f9d8a690f))
+
 ## [1.8.1](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.8.0...v1.8.1) (2026-04-08)
 
 
