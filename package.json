@@ -10,7 +10,7 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "jose": "5.9.3",
+    "jose": "6.2.2",
     "uuid": "13.0.0"
   },
   "devDependencies": {
