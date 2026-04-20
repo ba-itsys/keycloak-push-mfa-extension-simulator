@@ -9,6 +9,7 @@ import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.JWTParser;
 import com.nimbusds.jwt.SignedJWT;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -24,6 +25,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -162,7 +164,7 @@ public class ConfirmController {
             String pendingUrl = basePendingUrl + "?userId=" + userId;
             logger.debug("Fetching pending challenges for userId: {} (encoded: {})", userId, basePendingUrl);
             // RFC 9449: htu must exclude query and fragment parts (userId)
-            String pendingDpop = createDpopJwt(credentialId, "GET", basePendingUrl, privateJwk);
+            String pendingDpop = createDpopJwtWithAth(credentialId, "GET", basePendingUrl, privateJwk, accessToken);
             logger.debug("DPoP JWT created for pending challenges endpoint: {}", basePendingUrl);
             JsonNode pendingJson = getPendingChallenges(pendingUrl, pendingDpop, accessToken);
 
@@ -205,7 +207,8 @@ public class ConfirmController {
             // Post challenge response
             String challengeEndpoint = iamUrl + "/push-mfa/login/challenges/" + challengeId + "/respond";
             logger.debug("Creating DPoP JWT for challenge endpoint: {}", challengeEndpoint);
-            String dpopChallengeToken = createDpopJwt(credentialId, "POST", challengeEndpoint, privateJwk);
+            String dpopChallengeToken =
+                    createDpopJwtWithAth(credentialId, "POST", challengeEndpoint, privateJwk, accessToken);
             String userVerifForChallenge = "approve".equals(effectiveAction) ? effectiveUserVerification : null;
             logger.info(
                     "Posting challenge response - action: {}, challengeId: {}, endpoint: {}",
@@ -310,7 +313,8 @@ public class ConfirmController {
             // Create DPoP JWT for lockout endpoint
             String lockoutEndpoint = iamUrl + LOGIN_LOCKOUT_ENDPOINT;
             logger.debug("Creating DPoP JWT for lockout endpoint: {}", lockoutEndpoint);
-            String dpopLockoutToken = createDpopJwt(credentialId, "POST", lockoutEndpoint, privateJwk);
+            String dpopLockoutToken =
+                    createDpopJwtWithAth(credentialId, "POST", lockoutEndpoint, privateJwk, accessToken);
 
             logger.info("Posting lockout request for userId: {}", userId);
             ResponseEntity<String> lockoutResponse = postLockout(lockoutEndpoint, dpopLockoutToken, accessToken);
@@ -356,17 +360,25 @@ public class ConfirmController {
     }
 
     private String createDpopJwt(String credentialId, String method, String url, RSAKey privateJwk) throws Exception {
+        return createDpopJwtWithAth(credentialId, method, url, privateJwk, null);
+    }
+
+    private String createDpopJwtWithAth(
+            String credentialId, String method, String url, RSAKey privateJwk, String accessToken) throws Exception {
         logger.trace("Creating DPoP JWT - method: {}, url: {}", method, url);
 
         String userId = extractUserIdFromCredentialId(credentialId);
-        JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
+        JWTClaimsSet.Builder claimsBuilder = new JWTClaimsSet.Builder()
                 .claim("htm", method)
                 .claim("htu", url)
                 .claim("sub", userId)
                 .claim("deviceId", DEVICE_STATIC_ID)
                 .issueTime(java.util.Date.from(java.time.Instant.now()))
-                .jwtID(UUID.randomUUID().toString())
-                .build();
+                .jwtID(UUID.randomUUID().toString());
+        if (StringUtils.hasText(accessToken)) {
+            claimsBuilder.claim("ath", createAccessTokenHash(accessToken));
+        }
+        JWTClaimsSet claimsSet = claimsBuilder.build();
 
         JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256)
                 .type(new JOSEObjectType("dpop+jwt"))
@@ -380,6 +392,13 @@ public class ConfirmController {
                 signedJWT.getJWTClaimsSet().getJWTID());
 
         return signedJWT.serialize();
+    }
+
+    private String createAccessTokenHash(String accessToken) throws Exception {
+        logger.trace("Creating access token hash for DPoP 'ath' claim");
+        java.security.MessageDigest digest = java.security.MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(accessToken.getBytes(StandardCharsets.UTF_8));
+        return java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
     }
 
     private String createChallengeToken(
