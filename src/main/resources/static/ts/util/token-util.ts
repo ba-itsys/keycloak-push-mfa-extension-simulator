@@ -1,4 +1,4 @@
-import { decodeJwt, importJWK, JWTHeaderParameters, JWTPayload, SignJWT } from 'jose';
+import { decodeJwt, importJWK, JWTHeaderParameters, JWTPayload, SignJWT, base64url } from 'jose';
 import type { JWK, KeyLike } from 'jose';
 import { v4 as uuidv4 } from 'uuid';
 import { TOKEN_ENDPOINT } from './urls';
@@ -20,6 +20,7 @@ export type DpopPayload = {
   cid?: string;
   htm?: string;
   htu?: string;
+  ath?: string;
   sub?: string;
   deviceId?: string;
   credId?: string;
@@ -115,7 +116,7 @@ export function extractUserIdFromCredentialId(credentialId: string): string | nu
   return userId.length > 0 ? userId : null;
 }
 
-export async function createDpopProof(credentialId: string, method: string, htu: string) {
+export async function createDpopProof(credentialId: string, method: string, htu: string, accessToken?: string) {
   const userId = extractUserIdFromCredentialId(credentialId) ?? credentialId;
 
   const dpopTokenPayload: DpopPayload = {
@@ -123,9 +124,17 @@ export async function createDpopProof(credentialId: string, method: string, htu:
     htu: htu,
     sub: userId,
     deviceId: DEVICE_STATIC_ID,
+    ath: accessToken ? await createAccessTokenHash(accessToken) : undefined,
   };
 
   return await createDpopJwt(dpopTokenPayload);
+}
+
+async function createAccessTokenHash(accessToken: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(accessToken);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  return base64url.encode(new Uint8Array(hashBuffer));
 }
 
 export async function createConfirmJwt(payload: DpopPayload) {
