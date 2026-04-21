@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.10.0](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.9.0...v1.10.0) (2026-04-21)
+
+
+### Features
+
+* add ath claim to dpop proof tokens ([3285643](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/328564366d2b4a8be2e626b8f289e0c857511b90))
+
+
+### Dependencies
+
+* **deps-dev:** bump @typescript-eslint/eslint-plugin ([d0a26f0](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/d0a26f0f64963ac630e2ef6f06240dbaf553e63e))
+* **deps-dev:** bump org.springframework.boot:spring-boot-starter-webmvc-test ([d9c1a6b](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/d9c1a6b66283d481fb0d824efc203a8c441cce86))
+* **deps-dev:** bump prettier from 3.8.1 to 3.8.3 ([bfb34e1](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/bfb34e1ba9a807daf395725daf5457df9b1d42e4))
+
 ## [1.9.0](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.8.1...v1.9.0) (2026-04-15)
 
 
