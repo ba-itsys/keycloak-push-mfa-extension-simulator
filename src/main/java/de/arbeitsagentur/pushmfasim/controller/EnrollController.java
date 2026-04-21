@@ -1,5 +1,10 @@
 package de.arbeitsagentur.pushmfasim.controller;
 
+import static de.arbeitsagentur.pushmfasim.util.DpopUtil.TOKEN_ENDPOINT;
+import static de.arbeitsagentur.pushmfasim.util.DpopUtil.createDpopJwt;
+import static de.arbeitsagentur.pushmfasim.util.DpopUtil.createDpopJwtWithAth;
+import static de.arbeitsagentur.pushmfasim.util.DpopUtil.getAccessToken;
+
 import com.nimbusds.jose.JOSEObjectType;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -49,6 +54,12 @@ public class EnrollController {
     @Value("${app.enroll.complete.url:http://localhost:8080/realms/demo/push-mfa/enroll/complete}")
     private String defaultIamUrl;
 
+    @Value("${app.clientId:push-device-client}")
+    private String clientId;
+
+    @Value("${app.clientSecret:device-client-secret}")
+    private String clientSecret;
+
     public EnrollController(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
@@ -65,7 +76,8 @@ public class EnrollController {
             @RequestParam String token,
             @RequestParam(required = false) String context,
             @RequestParam(required = false) String iamUrl,
-            @RequestParam(required = false) String pushProviderType)
+            @RequestParam(required = false) String pushProviderType,
+            @RequestParam(required = false) String dpop)
             throws Exception {
 
         logger.info("Starting enrollment completion process");
@@ -129,6 +141,9 @@ public class EnrollController {
 
         Map<String, Object> cnf = Map.of("jwk", publicJwk.toPublicJWK().toJSONObject());
 
+        String credentialId = userId + "-device-alias-" + context;
+        String enrollmentEndpoint = iamUrl + "/push-mfa/enroll/complete";
+
         // Build enrollment JWT
         logger.trace(
                 "Building enrollment JWT with claims - enrollmentId: {}, userId: {}, deviceType: ios, pushProviderType: {}",
@@ -146,7 +161,7 @@ public class EnrollController {
                 .claim(
                         "pushProviderType",
                         pushProviderType != null && !pushProviderType.isEmpty() ? pushProviderType : "log")
-                .claim("credentialId", userId + "-device-alias-" + context)
+                .claim("credentialId", credentialId)
                 .claim("cnf", cnf)
                 .build();
         logger.debug("Enrollment JWT claims set created");
@@ -171,6 +186,26 @@ public class EnrollController {
         List<MediaType> acceptList = new ArrayList<>();
         acceptList.add(MediaType.APPLICATION_JSON);
         headers.setAccept(acceptList);
+        // optional dpop
+        if ("true".equalsIgnoreCase(dpop)) {
+            // Create DPoP proof for access token request
+            logger.debug("Creating DPoP JWT for token endpoint: {}", iamUrl + TOKEN_ENDPOINT);
+            String dPopAccessTokenJwt = createDpopJwt(credentialId, "POST", iamUrl + TOKEN_ENDPOINT, privateJwk);
+            logger.debug("DPoP JWT created successfully");
+
+            // Get access token
+            logger.info("Requesting access token from Keycloak endpoint: {}", iamUrl + TOKEN_ENDPOINT);
+            String accessToken = getAccessToken(restTemplate, iamUrl, dPopAccessTokenJwt, clientId, clientSecret);
+            if (accessToken == null) {
+                logger.warn("Failed to obtain access token from: {}", iamUrl + TOKEN_ENDPOINT);
+                return ResponseEntity.status(401).body("Failed to obtain access token");
+            }
+            logger.info("Access token obtained successfully");
+
+            headers.set("Authorization", "DPoP " + accessToken);
+            String dPopJwt = createDpopJwtWithAth(credentialId, "POST", enrollmentEndpoint, privateJwk, accessToken);
+            headers.set("DPoP", dPopJwt);
+        }
         logger.debug("Prepared HTTP headers for enrollment completion request");
 
         HttpEntity<String> entity = new HttpEntity<>(jsonBody, headers);
@@ -178,7 +213,6 @@ public class EnrollController {
         Objects.requireNonNull(iamUrl, "iamUrl must not be null");
         Objects.requireNonNull(HttpMethod.POST, "httpMethod must not be null");
 
-        String enrollmentEndpoint = iamUrl + "/push-mfa/enroll/complete";
         logger.info("Sending enrollment completion request to Keycloak endpoint: {}", enrollmentEndpoint);
         logger.trace("Enrollment token being sent, length: {}", enrollmentToken.length());
 
