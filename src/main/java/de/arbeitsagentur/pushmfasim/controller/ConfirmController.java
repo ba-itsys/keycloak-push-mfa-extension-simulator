@@ -1,5 +1,12 @@
 package de.arbeitsagentur.pushmfasim.controller;
 
+import static de.arbeitsagentur.pushmfasim.util.DpopUtil.DEVICE_STATIC_ID;
+import static de.arbeitsagentur.pushmfasim.util.DpopUtil.TOKEN_ENDPOINT;
+import static de.arbeitsagentur.pushmfasim.util.DpopUtil.createDpopJwt;
+import static de.arbeitsagentur.pushmfasim.util.DpopUtil.createDpopJwtWithAth;
+import static de.arbeitsagentur.pushmfasim.util.DpopUtil.extractUserIdFromCredentialId;
+import static de.arbeitsagentur.pushmfasim.util.DpopUtil.getAccessToken;
+
 import com.nimbusds.jose.JOSEObjectType;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -9,9 +16,7 @@ import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.JWTParser;
 import com.nimbusds.jwt.SignedJWT;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +30,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -63,9 +67,6 @@ public class ConfirmController {
         this.restTemplate = restTemplate;
     }
 
-    private static final String DEVICE_ALIAS = "-device-alias-";
-    private static final String DEVICE_STATIC_ID = "device-static-id";
-    private static final String TOKEN_ENDPOINT = "/protocol/openid-connect/token";
     private static final String LOGIN_PENDING_ENDPOINT = "/push-mfa/login/pending";
     private static final String LOGIN_LOCKOUT_ENDPOINT = "/push-mfa/login/lockout";
 
@@ -153,7 +154,7 @@ public class ConfirmController {
 
             // Get access token
             logger.info("Requesting access token from Keycloak endpoint: {}", iamUrl + TOKEN_ENDPOINT);
-            String accessToken = getAccessToken(iamUrl, dPopAccessTokenJwt);
+            String accessToken = getAccessToken(restTemplate, iamUrl, dPopAccessTokenJwt, clientId, clientSecret);
             if (accessToken == null) {
                 logger.warn("Failed to obtain access token from: {}", iamUrl + TOKEN_ENDPOINT);
                 return ResponseEntity.status(401).body("Failed to obtain access token");
@@ -302,7 +303,7 @@ public class ConfirmController {
             // Create DPoP JWT for token endpoint
             String tokenEndpointUrl = iamUrl + TOKEN_ENDPOINT;
             String dPopAccessTokenJwt = createDpopJwt(credentialId, "POST", tokenEndpointUrl, privateJwk);
-            String accessToken = getAccessToken(iamUrl, dPopAccessTokenJwt);
+            String accessToken = getAccessToken(restTemplate, iamUrl, dPopAccessTokenJwt, clientId, clientSecret);
 
             if (ObjectUtils.isEmpty(accessToken)) {
                 logger.warn("Failed to obtain access token for lockout");
@@ -346,61 +347,6 @@ public class ConfirmController {
         return null;
     }
 
-    private String extractUserIdFromCredentialId(String credentialId) {
-        if (credentialId == null || credentialId.isBlank()) {
-            return null;
-        }
-
-        int aliasIndex = credentialId.indexOf(DEVICE_ALIAS);
-        if (aliasIndex < 0) {
-            return null;
-        }
-        String userId = credentialId.substring(0, aliasIndex);
-        return userId.isBlank() ? null : userId;
-    }
-
-    private String createDpopJwt(String credentialId, String method, String url, RSAKey privateJwk) throws Exception {
-        return createDpopJwtWithAth(credentialId, method, url, privateJwk, null);
-    }
-
-    private String createDpopJwtWithAth(
-            String credentialId, String method, String url, RSAKey privateJwk, String accessToken) throws Exception {
-        logger.trace("Creating DPoP JWT - method: {}, url: {}", method, url);
-
-        String userId = extractUserIdFromCredentialId(credentialId);
-        JWTClaimsSet.Builder claimsBuilder = new JWTClaimsSet.Builder()
-                .claim("htm", method)
-                .claim("htu", url)
-                .claim("sub", userId)
-                .claim("deviceId", DEVICE_STATIC_ID)
-                .issueTime(java.util.Date.from(java.time.Instant.now()))
-                .jwtID(UUID.randomUUID().toString());
-        if (StringUtils.hasText(accessToken)) {
-            claimsBuilder.claim("ath", createAccessTokenHash(accessToken));
-        }
-        JWTClaimsSet claimsSet = claimsBuilder.build();
-
-        JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256)
-                .type(new JOSEObjectType("dpop+jwt"))
-                .jwk(privateJwk.toPublicJWK())
-                .build();
-
-        SignedJWT signedJWT = new SignedJWT(header, claimsSet);
-        signedJWT.sign(new RSASSASigner(privateJwk));
-        logger.trace(
-                "DPoP JWT created successfully with jti: {}",
-                signedJWT.getJWTClaimsSet().getJWTID());
-
-        return signedJWT.serialize();
-    }
-
-    private String createAccessTokenHash(String accessToken) throws Exception {
-        logger.trace("Creating access token hash for DPoP 'ath' claim");
-        java.security.MessageDigest digest = java.security.MessageDigest.getInstance("SHA-256");
-        byte[] hash = digest.digest(accessToken.getBytes(StandardCharsets.UTF_8));
-        return java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
-    }
-
     private String createChallengeToken(
             String credentialId, String challengeId, String action, String userVerification, RSAKey privateJwk)
             throws Exception {
@@ -435,44 +381,6 @@ public class ConfirmController {
         logger.trace("Challenge token signed successfully");
 
         return signedJWT.serialize();
-    }
-
-    private String getAccessToken(String iamUrl, String dPopToken) {
-        String url = iamUrl + TOKEN_ENDPOINT;
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.set("DPoP", dPopToken);
-        logger.debug("Requesting access token with client ID: {} from: {}", clientId, url);
-
-        // Use client credentials grant with device client ID/secret
-        String body = "grant_type=client_credentials" + "&client_id=" + clientId + "&client_secret=" + clientSecret;
-
-        HttpEntity<String> request = new HttpEntity<>(body, headers);
-        try {
-            logger.trace("Sending token request to Keycloak");
-            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
-            logger.debug("Token endpoint response status: {}", response.getStatusCode());
-
-            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                ObjectMapper mapper = new ObjectMapper();
-                JsonNode jsonNode = mapper.readTree(response.getBody());
-                if (jsonNode.has("access_token")) {
-                    String token = jsonNode.get("access_token").asString();
-                    logger.debug("Access token obtained successfully, token length: {}", token.length());
-                    return token;
-                } else {
-                    logger.warn("Access token not found in response");
-                }
-            } else {
-                logger.warn(
-                        "Token endpoint returned unsuccessful status: {}, body: {}",
-                        response.getStatusCode(),
-                        response.getBody());
-            }
-        } catch (Exception e) {
-            logger.error("Failed to get access token from {}", url, e);
-        }
-        return null;
     }
 
     @SuppressWarnings("null")

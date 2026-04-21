@@ -3,6 +3,7 @@ package de.arbeitsagentur.pushmfasim.controller;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.nimbusds.jwt.JWTClaimsSet;
+import de.arbeitsagentur.pushmfasim.util.DpopUtil;
 import java.lang.reflect.Method;
 import java.util.Date;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,11 +46,8 @@ class ConfirmControllerTest {
     @Test
     @DisplayName("Should extract userId from credentialId correctly")
     void testExtractUserIdFromCredentialId() throws Exception {
-        Method method = ConfirmController.class.getDeclaredMethod("extractUserIdFromCredentialId", String.class);
-        method.setAccessible(true);
-
         String credentialId = "user123-device-alias-context";
-        String result = (String) method.invoke(confirmController, credentialId);
+        String result = (String) DpopUtil.extractUserIdFromCredentialId(credentialId);
 
         assertEquals("user123", result);
     }
@@ -57,11 +55,8 @@ class ConfirmControllerTest {
     @Test
     @DisplayName("Should return null when extracting userId from invalid credentialId")
     void testExtractUserIdFromInvalidCredentialId() throws Exception {
-        Method method = ConfirmController.class.getDeclaredMethod("extractUserIdFromCredentialId", String.class);
-        method.setAccessible(true);
-
         String credentialId = "invalid-credential";
-        String result = (String) method.invoke(confirmController, credentialId);
+        String result = (String) DpopUtil.extractUserIdFromCredentialId(credentialId);
 
         assertNull(result);
     }
@@ -328,10 +323,7 @@ class ConfirmControllerTest {
         String context = "test-context";
         String credentialId = userId + "-device-alias-" + context;
 
-        Method method = ConfirmController.class.getDeclaredMethod("extractUserIdFromCredentialId", String.class);
-        method.setAccessible(true);
-
-        String result = (String) method.invoke(confirmController, credentialId);
+        String result = (String) DpopUtil.extractUserIdFromCredentialId(credentialId);
         assertEquals(userId, result);
     }
 }

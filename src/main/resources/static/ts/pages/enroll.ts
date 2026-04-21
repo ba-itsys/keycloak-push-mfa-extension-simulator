@@ -86,6 +86,7 @@ onReady(() => {
           _iamUrl ? _iamUrl.toString() : 'http://localhost:8080/realms/demo'
         );
         formData.append('pushProviderType', providerTypeEl.value.trim() || 'log');
+        formData.append('dpop', dpopEl.checked ? 'true' : 'false');
 
         const response = await fetch('./enroll/complete', {
           method: 'POST',
@@ -127,7 +128,7 @@ onReady(() => {
           outEl.textContent = 'Failed to obtain DPoP access token.';
           return;
         }
-        dPop = await createDpopProof(credentialId, 'POST', _iamUrl.toString() + ENROLL_COMPLETE);
+        dPop = await createDpopProof(credentialId, 'POST', _iamUrl.toString() + ENROLL_COMPLETE, accessToken);
       }
       const keycloakResponse = await postEnrollComplete(
         enrollmentJwt,
