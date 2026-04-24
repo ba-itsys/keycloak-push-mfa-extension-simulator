@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.10.1](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.10.0...v1.10.1) (2026-04-24)
+
+
+### Bug Fixes
+
+* optional dpop on enrollment also with backend ([5aa4ab4](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/5aa4ab4a252d76294f87e712a8df5b8e24ecc9d4))
+
+
+### Dependencies
+
+* **deps-dev:** bump @typescript-eslint/eslint-plugin ([8155b50](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/8155b5018eca8ea8a6579256b269e2575b442522))
+* **deps-dev:** bump @typescript-eslint/parser from 8.58.2 to 8.59.0 ([35ba438](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/35ba4383d24cbaa57cb291bceccc416c03bf94b3))
+* **deps-dev:** bump com.github.eirslett:frontend-maven-plugin ([ba13f37](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/ba13f37a71c91f4da5f121befebd1145c930032b))
+* **deps-dev:** bump eslint from 8.57.1 to 10.2.1 ([10a2fb3](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/10a2fb3e12d79f8770a04c0b6ff065cbcf21a42a))
+* **deps-dev:** bump typescript from 5.9.3 to 6.0.3 ([b79da53](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/b79da53480a348ef2e530fae070a192296bbc00e))
+* **deps:** bump jose from 5.9.3 to 6.2.2 ([3023863](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/3023863138c41ae3e4fb445252c893e8403d5e1f))
+* **deps:** bump org.apache.httpcomponents.client5:httpclient5 ([657807d](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/657807d21331ab6287a1df677b13494485faf03e))
+* **deps:** bump org.projectlombok:lombok from 1.18.44 to 1.18.46 ([072f5c1](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/072f5c1ffa2fc037aed215ffcaa3580d8b136704))
+
 ## [1.10.0](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.9.0...v1.10.0) (2026-04-21)
 
 
