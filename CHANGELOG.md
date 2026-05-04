@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.10.2](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.10.1...v1.10.2) (2026-05-04)
+
+
+### Dependencies
+
+* **deps-dev:** bump @typescript-eslint/eslint-plugin ([4176e06](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/4176e06bb6fe158e3660b0dbaf2467399f3fd3ed))
+* **deps-dev:** bump @typescript-eslint/parser from 8.59.0 to 8.59.1 ([095a1b8](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/095a1b8febaba55278ca378ccdf8af5c7ed2585d))
+* **deps-dev:** bump org.springframework.boot:spring-boot-starter-webmvc-test ([f043099](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/f043099230d29049d015c6110afb29d089151989))
+* **deps:** bump jose from 6.2.2 to 6.2.3 ([9595124](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/9595124a585956c75a4bcf1068c0e005b1bc853e))
+* **deps:** bump org.springframework.boot:spring-boot-starter-parent ([607f47a](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/607f47a23829f7abe1c837bd651055b540b518ce))
+* **deps:** bump uuid from 13.0.0 to 14.0.0 ([be9777a](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/be9777ac05ceeb773a064428c115ed9aaf18a56b))
+
 ## [1.10.1](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.10.0...v1.10.1) (2026-04-24)
 
 
