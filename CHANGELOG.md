@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.10.3](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.10.2...v1.10.3) (2026-05-06)
+
+
+### Dependencies
+
+* **deps-dev:** bump @typescript-eslint/eslint-plugin ([a4a34c5](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/a4a34c5014e073c2f7f72e62ae84e6e26182f600))
+* **deps-dev:** bump eslint from 10.2.1 to 10.3.0 ([a041e35](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/a041e352ecb2412d7832e18b28706178f20e17b1))
+
 ## [1.10.2](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.10.1...v1.10.2) (2026-05-04)
 
 
