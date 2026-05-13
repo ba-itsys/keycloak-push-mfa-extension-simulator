@@ -27,7 +27,32 @@ onReady(() => {
   const createJwkBtn = getById<HTMLInputElement>('createJwkBtn');
   const enrollBtn = getById<HTMLInputElement>('enrollBtn');
 
-  tokenEl.value = qs.get('token') ?? '';
+  const collectTokenFromParamOrUri = () => {
+    // direct token param or token from request_uri param
+    if (qs.has('request_uri')) {
+      const uri = qs.get('request_uri');
+      if (!uri) {
+        outEl.textContent = 'request_uri parameter is empty.';
+        return;
+      }
+      fetch(uri, { method: 'GET', headers: { 'Accept': 'application/jwt' } })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Failed to fetch token from request_uri');
+          }
+          return response.text();
+        })
+        .then((tokenText) => {
+          tokenEl.value = tokenText;
+        })
+        .catch((e) => {
+          console.error('Error fetching token from request_uri:', e);
+          outEl.textContent = 'Error fetching token from request_uri: ' + e.message;
+        });
+    } else if (qs.has('token')) {
+      tokenEl.value = qs.get('token') ?? '';
+    }
+  }
 
   // Function to extract issuer from token and set iamUrl
   const updateIamUrlFromToken = () => {
@@ -43,6 +68,9 @@ onReady(() => {
       }
     }
   };
+
+  // collect token either from token param or by requesting request_uri param on page load
+  collectTokenFromParamOrUri();
 
   // Extract issuer from token on page load
   updateIamUrlFromToken();
