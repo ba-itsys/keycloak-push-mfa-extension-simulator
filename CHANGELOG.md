@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.0](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.10.3...v1.11.0) (2026-05-13)
+
+
+### Features
+
+* load token from request_uri if given ([16eaa41](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/16eaa4106b514abb22b4369d9ca005e6ddab1436))
+
 ## [1.10.3](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.10.2...v1.10.3) (2026-05-06)
 
 
