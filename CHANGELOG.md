@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.1](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.11.0...v1.11.1) (2026-05-13)
+
+
+### Bug Fixes
+
+* trigger update of url on enrollment token request ([0d5a550](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/0d5a5500835d836cadcc73991110b11ea0611010))
+
 ## [1.11.0](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.10.3...v1.11.0) (2026-05-13)
 
 
