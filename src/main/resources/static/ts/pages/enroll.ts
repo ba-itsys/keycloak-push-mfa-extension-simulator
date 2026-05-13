@@ -35,7 +35,7 @@ onReady(() => {
         outEl.textContent = 'request_uri parameter is empty.';
         return;
       }
-      fetch(uri, { method: 'GET', headers: { 'Accept': 'application/jwt' } })
+      fetch(uri, { method: 'GET', headers: { Accept: 'application/jwt' } })
         .then((response) => {
           if (!response.ok) {
             throw new Error('Failed to fetch token from request_uri');
@@ -44,6 +44,7 @@ onReady(() => {
         })
         .then((tokenText) => {
           tokenEl.value = tokenText;
+          tokenEl.dispatchEvent(new Event('change')); // trigger change event to update iamUrl
         })
         .catch((e) => {
           console.error('Error fetching token from request_uri:', e);
@@ -52,7 +53,7 @@ onReady(() => {
     } else if (qs.has('token')) {
       tokenEl.value = qs.get('token') ?? '';
     }
-  }
+  };
 
   // Function to extract issuer from token and set iamUrl
   const updateIamUrlFromToken = () => {
@@ -156,7 +157,12 @@ onReady(() => {
           outEl.textContent = 'Failed to obtain DPoP access token.';
           return;
         }
-        dPop = await createDpopProof(credentialId, 'POST', _iamUrl.toString() + ENROLL_COMPLETE, accessToken);
+        dPop = await createDpopProof(
+          credentialId,
+          'POST',
+          _iamUrl.toString() + ENROLL_COMPLETE,
+          accessToken
+        );
       }
       const keycloakResponse = await postEnrollComplete(
         enrollmentJwt,
