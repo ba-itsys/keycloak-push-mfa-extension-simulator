@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.0](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.11.1...v1.12.0) (2026-05-18)
+
+
+### Features
+
+* add support for running on localhost docker container ([3a86d5f](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/3a86d5f7a9f504205f56acdcc4e452022b129d00))
+
 ## [1.11.1](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.11.0...v1.11.1) (2026-05-13)
 
 
