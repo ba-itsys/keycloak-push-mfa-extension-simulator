@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.1](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.12.0...v1.12.1) (2026-05-18)
+
+
+### Bug Fixes
+
+* correct dpop on frontend confirm ([e330d4b](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/e330d4b6b74d3ce9086ac03884357193439f5f07))
+
 ## [1.12.0](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.11.1...v1.12.0) (2026-05-18)
 
 
