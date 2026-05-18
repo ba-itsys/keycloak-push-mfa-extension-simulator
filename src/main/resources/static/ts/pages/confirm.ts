@@ -170,7 +170,7 @@ onReady(() => {
       pendingUrl.searchParams.set('userId', userId);
 
       // RFC 9449: htu must exclude query and fragment parts
-      const pendingDpop = await createDpopProof(credentialId, 'GET', pendingHtu.toString());
+      const pendingDpop = await createDpopProof(credentialId, 'GET', pendingHtu.toString(), accessToken);
       const pendingResponse = await getPendingChallenges(
         pendingUrl.toString(),
         pendingDpop,
@@ -196,7 +196,7 @@ onReady(() => {
         return;
       }
       const url = iamUrl + CHALLENGE_ENDPOINT.replace(CHALLENGE_ID, challengeId);
-      const dpopChallengeToken = await createDpopProof(credentialId, 'POST', url);
+      const dpopChallengeToken = await createDpopProof(credentialId, 'POST', url, accessToken);
       const challengeToken = await createChallengeToken(
         credentialId,
         challengeId,
