@@ -32,9 +32,10 @@ docker run -p 5000:5000 push-mfa-extension-simulator
 
 ### Prerequisites
 
-- **Java 21**: For running Spring Boot application
-- **Node.js 20.11.1**: Automatically installed and managed by Maven frontend plugin
-- **Maven 3.8+**: For building the project
+- **JDK**: See `pom.xml` for the required Java version.
+- **Node.js**: Automatically installed and managed by Maven frontend plugin (see `pom.xml` or `package.json`).
+- **Maven**: Used for building the project.
+- **Docker**: Required for building and running the simulator container (see `Dockerfile`).
 
 ### Build Tools & Workflow
 
@@ -69,11 +70,15 @@ npm run format
 
 # Maven build (includes TypeScript build)
 mvn clean package
-
-# Run tests & checks (after AGENTS.md workflow)
-mvn spotless:apply
-mvn verify
 ```
+
+#### Checks (formatting and tests)
+
+Run the following commands locally to ensure code quality:
+
+- **Formatting**: `mvn spotless:apply` (Ensures consistent code style).
+- **Verification**: `mvn verify` (Runs the full test suite and builds the project).
+
 
 ## Architecture & CORS
 
