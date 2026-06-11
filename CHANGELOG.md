@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.12.3](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.12.2...v1.12.3) (2026-06-11)
+
+
+### Bug Fixes
+
+* request enroll token at backend to prevent cors ([2a24a7c](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/2a24a7cfbb4d7735bee3a15d3c85da537da519b1))
+
+
+### Dependencies
+
+* **deps-dev:** bump @typescript-eslint/eslint-plugin ([1ab982a](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/1ab982a7046cc41d5ba12e163ae24417cdf5641e))
+* **deps-dev:** bump @typescript-eslint/parser from 8.59.4 to 8.60.0 ([237af6a](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/237af6a8a12828a7cdaf3d05a967672565434204))
+
 ## [1.12.2](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.12.1...v1.12.2) (2026-05-21)
 
 
