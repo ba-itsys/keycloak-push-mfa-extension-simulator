@@ -30,6 +30,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,6 +60,9 @@ public class EnrollController {
 
     @Value("${app.clientSecret:device-client-secret}")
     private String clientSecret;
+
+    @Value("${app.localhostReplacement:}")
+    private String localhostReplacement;
 
     public EnrollController(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -234,5 +238,28 @@ public class EnrollController {
         }
 
         return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
+    }
+
+    @GetMapping("/token")
+    @ResponseBody
+    public ResponseEntity<String> getToken(@RequestParam String request_uri) {
+        String finalRequestUri = request_uri;
+        if (StringUtils.hasText(localhostReplacement)) {
+            finalRequestUri = request_uri.replace("localhost", localhostReplacement);
+            logger.debug(
+                    "Replaced 'localhost' in request_uri with '{}', finalRequestUri: {}",
+                    localhostReplacement,
+                    finalRequestUri);
+        }
+        ResponseEntity<String> response = restTemplate.getForEntity(finalRequestUri, String.class);
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            logger.warn(
+                    "Failed to retrieve token from request_uri: {}, status: {}",
+                    finalRequestUri,
+                    response.getStatusCode());
+            return ResponseEntity.status(response.getStatusCode()).body("Failed to retrieve token");
+        }
+        logger.info("Token retrieved successfully from request_uri: {}", finalRequestUri);
+        return ResponseEntity.ok(response.getBody());
     }
 }
