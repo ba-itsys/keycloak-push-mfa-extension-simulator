@@ -35,7 +35,9 @@ onReady(() => {
         outEl.textContent = 'request_uri parameter is empty.';
         return;
       }
-      fetch(uri, { method: 'GET', headers: { Accept: 'application/jwt' } })
+      // use backend as proxy to avoid CORS issues since request_uri may not have CORS enabled
+      const proxyUri = './enroll/token?request_uri=' + encodeURIComponent(uri);
+      fetch(proxyUri, { method: 'GET', headers: { Accept: 'application/jwt' } })
         .then((response) => {
           if (!response.ok) {
             throw new Error('Failed to fetch token from request_uri');
