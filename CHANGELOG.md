@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.12.4](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.12.3...v1.12.4) (2026-06-22)
+
+
+### Dependencies
+
+* **deps-dev:** bump @typescript-eslint/eslint-plugin ([8ee87be](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/8ee87bec4c31bf8b4c0736fd130017e84c3a718a))
+* **deps-dev:** bump @typescript-eslint/parser from 8.60.0 to 8.61.1 ([4f43693](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/4f43693454b95524e2e99388cfadd8521eee7406))
+* **deps-dev:** bump com.diffplug.spotless:spotless-maven-plugin ([8e3cd72](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/8e3cd724729ca7f0e186931ab00d5c0801bac12c))
+* **deps-dev:** bump com.github.eirslett:frontend-maven-plugin ([cc182e4](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/cc182e4c84d7875298c32adf322663a29405e82d))
+* **deps-dev:** bump esbuild from 0.28.0 to 0.28.1 ([8529534](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/8529534c32e142af01f0c1a1793b104c74d6dd70))
+* **deps-dev:** bump eslint from 10.4.0 to 10.5.0 ([8c1dc92](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/8c1dc925a053ed99dcc488b3c0511ac6727ec7d3))
+* **deps-dev:** bump org.springframework.boot:spring-boot-starter-webmvc-test ([b7e48bd](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/b7e48bd700deca6c9369071410288b2991ababb6))
+* **deps-dev:** bump prettier from 3.8.3 to 3.8.4 ([b362482](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/b36248215e27cb89fc4a59c818911ccff638ab43))
+* **deps:** bump com.nimbusds:nimbus-jose-jwt from 10.9 to 10.9.1 ([a458ee3](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/a458ee35c6575021bb81c84089780cb1882ca737))
+* **deps:** bump org.springframework.boot:spring-boot-starter-parent ([4a52657](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/4a526579afaabacda8737ce91a5164aff5639c77))
+
 ## [1.12.3](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.12.2...v1.12.3) (2026-06-11)
 
 
