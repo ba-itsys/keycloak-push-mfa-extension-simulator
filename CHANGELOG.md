@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.12.5](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.12.4...v1.12.5) (2026-07-02)
+
+
+### Dependencies
+
+* **deps-dev:** bump @typescript-eslint/eslint-plugin ([dfa1427](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/dfa142745e17a905b7437ff1b8f70be36c4ad65c))
+* **deps-dev:** bump @typescript-eslint/eslint-plugin ([a6981c5](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/a6981c5e4b0a3758fe985ec8552560bd20d60b1f))
+* **deps-dev:** bump @typescript-eslint/parser from 8.62.0 to 8.62.1 ([3323c4f](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/3323c4f80b5b939d1c0b711636412f0529f0c63f))
+* **deps-dev:** bump com.diffplug.spotless:spotless-maven-plugin ([8605abf](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/8605abf4b01da138b97315d28ce8de331052a70c))
+* **deps-dev:** bump eslint from 10.5.0 to 10.6.0 ([1e64349](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/1e64349394fcf07a396c38f3d072aefbc24fdef1))
+* **deps-dev:** bump prettier from 3.8.4 to 3.9.4 ([3a9bfff](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/3a9bfff1c49352e0565d42d6d4fe71efb94ae8e1))
+* **deps:** bump org.apache.httpcomponents.client5:httpclient5 ([86744c1](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/86744c1b75a0f600eea82175f7f75d6c37bb6a81))
+* **deps:** bump uuid from 14.0.0 to 14.0.1 ([71c240e](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/71c240e4b305b98f1458b05550f81216a22fbd5d))
+
 ## [1.12.4](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.12.3...v1.12.4) (2026-06-22)
 
 
