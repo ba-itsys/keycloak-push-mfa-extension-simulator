@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.0](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.12.8...v1.13.0) (2026-07-31)
+
+
+### Features
+
+* add config parameter for dpop on enrollment ([c34ba41](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/c34ba41899aedf41d328607326271a9ea00a2dff))
+
 ## [1.12.8](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.12.7...v1.12.8) (2026-07-30)
 
 
