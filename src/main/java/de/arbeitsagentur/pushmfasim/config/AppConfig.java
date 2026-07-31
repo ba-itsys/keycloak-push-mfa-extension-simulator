@@ -18,7 +18,8 @@ public class AppConfig {
             @Value("${app.clientSecret}") String clientSecret,
             @Value("${app.sseFlag}") String sseFlag,
             @Value("${app.providerIds}") String providerIds,
-            @Value("${app.localhostReplacement}") String localhostReplacement) {
+            @Value("${app.localhostReplacement}") String localhostReplacement,
+            @Value("${app.dpopOnEnrollment}") Boolean dpopOnEnrollment) {
         ThymeleafViewResolver thymeleafViewResolver = new ThymeleafViewResolver();
         thymeleafViewResolver.setTemplateEngine(templateEngine);
         thymeleafViewResolver.setCharacterEncoding("UTF-8");
@@ -28,6 +29,7 @@ public class AppConfig {
         thymeleafViewResolver.addStaticVariable("sseFlag", sseFlag);
         thymeleafViewResolver.addStaticVariable("providerIds", providerIds);
         thymeleafViewResolver.addStaticVariable("localhostReplacement", localhostReplacement);
+        thymeleafViewResolver.addStaticVariable("dpopOnEnrollment", dpopOnEnrollment);
         return thymeleafViewResolver;
     }
 }
