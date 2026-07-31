@@ -22,6 +22,8 @@ app:
   providerIds: ${APP_PROVIDERIDS:log,fcm,none}
   # url replacement for "localhost"
   localhostReplacement: ${APP_LOCALHOSTREPLACEMENT:}
+  # dpop on enrollment request
+  dpopOnEnrollment: ${APP_DPOPONENROLLMENT:false}
 
 server:
   port: 5000

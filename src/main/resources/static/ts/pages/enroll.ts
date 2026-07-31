@@ -93,6 +93,9 @@ onReady(() => {
     providerTypeEl.appendChild(option);
   });
 
+  // Set dpop checkbox based on server-provided flag
+  dpopEl.checked = window.ENV.dpopOnEnrollment || false;
+
   // Update iamUrl when token is changed
   tokenEl.addEventListener('change', updateIamUrlFromToken);
   tokenEl.addEventListener('input', updateIamUrlFromToken);
