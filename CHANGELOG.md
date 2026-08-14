@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.13.1](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.13.0...v1.13.1) (2026-08-14)
+
+
+### Dependencies
+
+* **deps-dev:** bump @typescript-eslint/eslint-plugin ([beda590](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/beda590add0f409dc0d2e056bd2934f24b5c8be2))
+* **deps-dev:** bump eslint from 10.8.0 to 10.8.1 ([a3b57e9](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/a3b57e9c13ed42945eb1304b2ba8e57bca037a86))
+* **deps:** bump commons-validator:commons-validator ([007b2eb](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/007b2ebee1e5337447571c832611d96f3d7812c6))
+* **deps:** bump jose from 6.2.4 to 6.2.8 ([5aef581](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/5aef58165aac4bab852f0e6c95c66ee1cd2c0d1e))
+* **deps:** bump org.apache.httpcomponents.client5:httpclient5 ([3b061f2](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/3b061f2bf8d13cd297239938389b3406724b782f))
+
 ## [1.13.0](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.12.8...v1.13.0) (2026-07-31)
 
 
