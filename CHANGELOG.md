@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.13.2](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.13.1...v1.13.2) (2026-08-27)
+
+
+### Dependencies
+
+* **deps-dev:** bump com.diffplug.spotless:spotless-maven-plugin ([09e8240](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/09e824081188b1d54c38a390383cd3187693fb1c))
+* **deps-dev:** bump esbuild from 0.28.1 to 0.28.2 ([e17dc50](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/e17dc509ec6cf5b41cea273cf7e897c9db508833))
+* **deps-dev:** bump eslint from 10.8.1 to 10.9.0 ([1bf7e4d](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/1bf7e4d3b85124be06359e47e95e282ae5a7b6ae))
+* **deps-dev:** bump org.springframework.boot:spring-boot-starter-webmvc-test ([627ebe4](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/627ebe40cd1059e9deae87ba87ce5fc69ae9882a))
+* **deps:** bump jose from 6.2.8 to 6.2.9 ([4ecc59e](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/4ecc59ea180a4ef894ddf13603a0f4f9418d80c2))
+* **deps:** bump jose from 6.2.9 to 6.2.10 ([2927afa](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/2927afa7ac994bb66b25cf93a034373f23b8fc7d))
+* **deps:** bump org.springframework.boot:spring-boot-starter-parent ([79bd054](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/79bd0549249e8af051dedbdbf91d63f65186081a))
+* **deps:** bump uuid from 14.0.1 to 14.0.2 ([36851a9](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/36851a94f21fc8ab3bff9ad1a520940a1f162f9a))
+
 ## [1.13.1](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.13.0...v1.13.1) (2026-08-14)
 
 
