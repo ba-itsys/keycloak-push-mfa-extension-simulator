@@ -50,10 +50,10 @@ docker run -p 5000:5000 push-mfa-extension-simulator
 - **ESLint 8.57**: TypeScript linting with `@typescript-eslint` parser
 - **Prettier 3.2.5**: Code formatting
 - **Commands**:
-  - `npm run lint` - Check for issues
-  - `npm run lint:fix` - Auto-fix ESLint errors
-  - `npm run format` - Format code with Prettier
-  - `npm run format:check` - Verify formatting compliance
+    - `npm run lint` - Check for issues
+    - `npm run lint:fix` - Auto-fix ESLint errors
+    - `npm run format` - Format code with Prettier
+    - `npm run format:check` - Verify formatting compliance
 
 #### Complete Build Workflow
 
@@ -79,12 +79,12 @@ Run the following commands locally to ensure code quality:
 - **Formatting**: `mvn spotless:apply` (Ensures consistent code style).
 - **Verification**: `mvn verify` (Runs the full test suite and builds the project).
 
-
 ## Architecture & CORS
 
 ### The Problem: Frontend + Backend on Same Host
 
-When running the simulator mock and Keycloak on the same host, you encounter **CORS (Cross-Origin Resource Sharing)** restrictions:
+When running the simulator mock and Keycloak on the same host, you encounter **CORS (Cross-Origin Resource Sharing)**
+restrictions:
 
 1. **Keycloak** typically runs on port `8080` (e.g., `http://localhost:8080/realms/demo`)
 2. **Mock simulator** runs on port `5000` (e.g., `http://localhost:5000/mock`)
@@ -99,7 +99,8 @@ from origin 'http://localhost:5000' has been blocked by CORS policy
 
 ### Solution: Reverse Proxy with Nginx
 
-Use an **nginx reverse proxy** to serve both Keycloak and the mock simulator under the **same host** and **same port** (443/HTTPS), eliminating CORS issues.
+Use an **nginx reverse proxy** to serve both Keycloak and the mock simulator under the **same host** and **same port**
+(443/HTTPS), eliminating CORS issues.
 
 #### Architecture
 
@@ -238,7 +239,8 @@ curl -k -v https://myapp.local/mock/info
 
 ### Using a proxy for communication between the mock (in docker) and keycloak (in docker)
 
-Add the following properties to the application.yaml to tell the mocks Rest Template to use the http proxy with the specified host and port:
+Add the following properties to the application.yaml to tell the mocks Rest Template to use the http proxy with the
+specified host and port:
 
 ### application.yaml
 
@@ -252,11 +254,14 @@ proxy:
 ### Example Enrollment Backend Call using mitmprox
 
 1. Spin up the mitmprox
+
 ```bash
 sudo docker run --rm -it -p 3128:8080 mitmproxy/mitmproxy mitmproxy --mode regular
 ```
 
-2. Configure Spring to use the proxy by using the default gateway IP 172.17.0.1 of the Docker bridge network (docker0). Add the following properties to the application.yaml:
+2. Configure Spring to use the proxy by using the default gateway IP 172.17.0.1 of the Docker bridge network (docker0).
+   Add the following properties to the application.yaml:
+
 ```yaml
 proxy:
   http:
@@ -265,11 +270,14 @@ proxy:
 ```
 
 3. Rebuild the application
+
 ```bash
 sudo docker build -t push-mfa-extension-simulator .
 sudo docker run -p 5000:5000 -p 5005:5005 push-mfa-extension-simulator
 ```
-4. In the PushMFA-Simulator UI on http://localhost:5000/mock/enroll change the URL IdentityManagement from http://localhost:8080/realms/demo to http://172.17.0.1:8080/realms/demo and click Enroll.
+
+4. In the PushMFA-Simulator UI on http://localhost:5000/mock/enroll change the URL IdentityManagement
+   from http://localhost:8080/realms/demo to http://172.17.0.1:8080/realms/demo and click Enroll.
 5. Verify the logs of the running nitmproxy instance
 
 ## Troubleshooting
@@ -277,7 +285,7 @@ sudo docker run -p 5000:5000 -p 5005:5005 push-mfa-extension-simulator
 ### Network & Connectivity Issues
 
 | Issue                       | Cause                         | Solution                                                                                                       |
-| --------------------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------- |
+|-----------------------------|-------------------------------|----------------------------------------------------------------------------------------------------------------|
 | `myapp.local` not resolving | Hosts file not updated        | Add `127.0.0.1 myapp.local` to `/etc/hosts` (Linux/macOS) or `C:\Windows\System32\drivers\etc\hosts` (Windows) |
 | Cannot reach host services  | Docker networking issue       | Verify `--add-host=host.docker.internal:host-gateway` in docker run command                                    |
 | 502 Bad Gateway             | Backend service not running   | Ensure Keycloak (port 8080) and mock simulator (port 5000) are running                                         |
@@ -287,7 +295,7 @@ sudo docker run -p 5000:5000 -p 5005:5005 push-mfa-extension-simulator
 ### SSL & Certificate Issues
 
 | Issue                           | Cause                              | Solution                                                                                  |
-| ------------------------------- | ---------------------------------- | ----------------------------------------------------------------------------------------- |
+|---------------------------------|------------------------------------|-------------------------------------------------------------------------------------------|
 | SSL certificate error           | Self-signed or untrusted cert      | Add `-k` to curl, accept in browser warning, or import cert to system trust store         |
 | Certificate expired             | Self-signed cert passed expiration | Regenerate certificate with `openssl req -x509 -newkey rsa:4096 ...`                      |
 | NET::ERR_CERT_AUTHORITY_INVALID | Browser doesn't trust cert         | For development: accept the risk, or configure Chrome with `--ignore-certificate-errors`  |
@@ -296,7 +304,7 @@ sudo docker run -p 5000:5000 -p 5005:5005 push-mfa-extension-simulator
 ### CORS Issues
 
 | Issue                                        | Cause                                     | Solution                                                          |
-| -------------------------------------------- | ----------------------------------------- | ----------------------------------------------------------------- |
+|----------------------------------------------|-------------------------------------------|-------------------------------------------------------------------|
 | CORS still occurring                         | Proxy not properly configured             | Verify `X-Forwarded-*` headers are present in `nginx.conf`        |
 | CORS origin mismatch                         | Frontend and backend on different origins | Ensure both use same protocol/host/port through nginx proxy       |
 | `Access-Control-Allow-Origin` header missing | Backend CORS not configured               | Check Spring Boot CORS configuration in backend, or proxy headers |
@@ -304,7 +312,7 @@ sudo docker run -p 5000:5000 -p 5005:5005 push-mfa-extension-simulator
 ### Docker Issues
 
 | Issue                     | Cause                      | Solution                                                                                   |
-| ------------------------- | -------------------------- | ------------------------------------------------------------------------------------------ |
+|---------------------------|----------------------------|--------------------------------------------------------------------------------------------|
 | Docker daemon not running | Docker service stopped     | Start Docker: `sudo systemctl start docker` (Linux) or open Docker Desktop (Windows/macOS) |
 | Cannot connect to Docker  | Permission issue           | Add user to docker group: `sudo usermod -aG docker $USER` and logout/login                 |
 | Image not found           | Image not pulled/built     | Pull or build image: `docker pull nginx:alpine` or `docker build -t name .`                |
@@ -314,7 +322,7 @@ sudo docker run -p 5000:5000 -p 5005:5005 push-mfa-extension-simulator
 ### Java & Maven Issues
 
 | Issue                                   | Cause                            | Solution                                                                                |
-| --------------------------------------- | -------------------------------- | --------------------------------------------------------------------------------------- |
+|-----------------------------------------|----------------------------------|-----------------------------------------------------------------------------------------|
 | `java: command not found`               | Java not installed               | Install Java 21: Use `sdk install java 21.0.1-tem` (sdkman) or download from oracle.com |
 | Wrong Java version                      | Multiple Java versions installed | Check: `java -version`, switch with `sdk use java 21.0.1-tem` (sdkman)                  |
 | `mvn: command not found`                | Maven not in PATH                | Install Maven or add to PATH, verify with `mvn -version`                                |
@@ -325,7 +333,7 @@ sudo docker run -p 5000:5000 -p 5005:5005 push-mfa-extension-simulator
 ### Application Runtime Issues
 
 | Issue                         | Cause                          | Solution                                                             |
-| ----------------------------- | ------------------------------ | -------------------------------------------------------------------- |
+|-------------------------------|--------------------------------|----------------------------------------------------------------------|
 | Application won't start       | Port already in use            | Change port in `application.yaml` or kill process using port 5000    |
 | TypeScript compilation errors | Node.js not installed          | Maven frontend plugin handles this, or manually install Node 20.11.1 |
 | Template not rendering        | Thymeleaf template missing     | Check file exists in `src/main/resources/views/` with correct name   |
@@ -335,7 +343,7 @@ sudo docker run -p 5000:5000 -p 5005:5005 push-mfa-extension-simulator
 ### Testing Issues
 
 | Issue                         | Cause                       | Solution                                                                |
-| ----------------------------- | --------------------------- | ----------------------------------------------------------------------- |
+|-------------------------------|-----------------------------|-------------------------------------------------------------------------|
 | Tests fail: JWT parsing error | Invalid test JWT token      | Use tokens generated with valid RSA key from `static/keys/rsa-jwk.json` |
 | Tests timeout                 | Slow mock creation          | Increase timeout in test or optimize mocks with Mockito                 |
 | `@SpringBootTest` fails       | Spring context not loading  | Check `application.yaml` and Spring configuration beans                 |
@@ -345,7 +353,7 @@ sudo docker run -p 5000:5000 -p 5005:5005 push-mfa-extension-simulator
 ### Debugging Issues
 
 | Issue                       | Cause                               | Solution                                                                                                                              |
-| --------------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+|-----------------------------|-------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
 | Breakpoint not hit          | Debug mode not enabled              | Start with: `mvn spring-boot:run -Dspring-boot.run.jvmArguments="-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"` |
 | Cannot attach debugger      | JDWP port not exposed               | Check debug server is listening on port 5005: `netstat -tlnp \| grep 5005`                                                            |
 | Variable values not visible | Wrong stack frame selected          | Ensure you're on correct frame in VS Code debug panel                                                                                 |
@@ -354,7 +362,7 @@ sudo docker run -p 5000:5000 -p 5005:5005 push-mfa-extension-simulator
 ### Frontend Issues
 
 | Issue                             | Cause                 | Solution                                                                    |
-| --------------------------------- | --------------------- | --------------------------------------------------------------------------- |
+|-----------------------------------|-----------------------|-----------------------------------------------------------------------------|
 | Enroll/Confirm page showing blank | Bundle not loaded     | Check browser console for 404s, verify bundle exists in `target/static/js/` |
 | TypeScript errors in console      | Source map missing    | Ensure `npm run build` generated `.map` files alongside bundles             |
 | Styling not applied               | CSS bundle not loaded | Check `static/css/layout.css` exists and is referenced in template          |
@@ -363,7 +371,7 @@ sudo docker run -p 5000:5000 -p 5005:5005 push-mfa-extension-simulator
 ### Performance & Optimization
 
 | Issue              | Cause                      | Solution                                                                             |
-| ------------------ | -------------------------- | ------------------------------------------------------------------------------------ |
+|--------------------|----------------------------|--------------------------------------------------------------------------------------|
 | Slow page load     | Large bundles              | Run `npm run build` to optimize, check bundle size with `npm run build -- --analyze` |
 | High memory usage  | Memory leak in application | Profile with VisualVM or JProfiler, check for unclosed resources                     |
 | Slow API responses | N+1 query problem          | Review database queries, use proper caching and lazy loading                         |
@@ -371,7 +379,7 @@ sudo docker run -p 5000:5000 -p 5005:5005 push-mfa-extension-simulator
 ### Development Workflow Issues
 
 | Issue                        | Cause                  | Solution                                                             |
-| ---------------------------- | ---------------------- | -------------------------------------------------------------------- |
+|------------------------------|------------------------|----------------------------------------------------------------------|
 | Changes not reflected        | Watch mode not running | Start watch: `npm run dev` in separate terminal                      |
 | Formatting issues at commit  | Spotless not enforced  | Run `mvn spotless:apply` before committing                           |
 | Linting errors prevent build | ESLint strict mode     | Fix with `npm run lint:fix` or disable specific rules in `.eslintrc` |
@@ -380,7 +388,7 @@ sudo docker run -p 5000:5000 -p 5005:5005 push-mfa-extension-simulator
 ### Environment & Configuration Issues
 
 | Issue                                 | Cause                   | Solution                                                                                 |
-| ------------------------------------- | ----------------------- | ---------------------------------------------------------------------------------------- |
+|---------------------------------------|-------------------------|------------------------------------------------------------------------------------------|
 | Application won't connect to Keycloak | Wrong Keycloak URL      | Check `KEYCLOAK_URL` environment variable and ensure Keycloak is reachable               |
 | Client credentials not loaded         | Missing `.env` file     | Create `.env` file with `CLIENT_ID` and `CLIENT_SECRET` values                           |
 | Realm configuration missing           | Demo realm not imported | Import `config/demo-realm.json` to Keycloak admin console                                |
@@ -425,7 +433,8 @@ src/main/resources/
 
 ## Device-Facing Endpoints
 
-Device endpoints are located under `/realms/<realm>/push-mfa/...` and expect **DPoP-bound tokens** (Demonstration of Proof-of-Possession).
+Device endpoints are located under `/realms/<realm>/push-mfa/...` and expect **DPoP-bound tokens** (Demonstration of
+Proof-of-Possession).
 
 Keep samples and tests aligned with the current realm name and URL structure.
 Device Client Configuration (Client ID / Client Secret)
@@ -447,17 +456,35 @@ Backend configuration via Spring Boot (secrets via environment variables or conf
 
 This mocks the firebase fcm googleapis enpoints for testing purpose.
 
-### Preconditions 
+### Preconditions
+
 - A implemented and configured Firebase FCM Provider in keycloak with ID "fcm"
 - Enrollment done with Provider Type "fcm"
 
 ### Endpoints
 
 */fcm/token*
-getting an access token 
+getting an access token
 
 */fcm/messages:send*
 sending a push message
 
 */fcm/credentials*
 provide mock service account credentials
+
+## Contributing
+
+Contributions are welcome! For detailed instructions, please refer to our
+central [Contributing Guide](https://github.com/ba-itsys/.github/blob/main/CONTRIBUTING.md).
+
+In short:
+
+- **Commit Guidelines**: We strictly follow [Conventional Commits](https://www.conventionalcommits.org/) — the commit
+  type (e.g., `feat`, `fix`, `docs`) drives our automated versioning and changelog generation. All commits must be
+  signed off with `git commit -s` (DCO).
+- **Pull Request Process**: Fork the repository, create a feature branch from `main`, and open a Pull Request against
+  `main` (rebased on the latest `main`). Every bug fix or new feature should include corresponding tests.
+- **Release Process**: Releases are automated with [release-please](https://github.com/googleapis/release-please), which
+  parses the conventional commits from the merged history to create version bumps, changelogs, and releases. See
+  the [Release Process documentation](https://github.com/ba-itsys/.github/blob/main/docs/release-process.md) for details
+  on commit types, validation, and the full release flow.
