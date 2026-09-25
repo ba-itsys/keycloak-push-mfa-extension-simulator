@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.13.6](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.13.5...v1.13.6) (2026-09-25)
+
+
+### Dependencies
+
+* **deps-dev:** bump eslint from 10.10.0 to 10.11.0 ([#222](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/issues/222)) ([0255059](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/025505934f4ef9bb457e9922e8959edb61ea88a8))
+* **deps-dev:** bump prettier from 3.9.6 to 3.9.8 ([#223](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/issues/223)) ([1e9736e](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/1e9736e46669593e71cb88e5acc2c5e12828101d))
+* **deps:** bump com.nimbusds:nimbus-jose-jwt from 10.9.1 to 10.10 ([#224](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/issues/224)) ([8ad37f7](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/8ad37f742ece2229201f2956d6f15745fb0149c3))
+
+
+### Documentation
+
+* add contributing guidelines to README ([3bbe501](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/3bbe501b55d7aaab285f883c5b989272e11276de))
+
 ## [1.13.5](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.13.4...v1.13.5) (2026-09-21)
 
 
