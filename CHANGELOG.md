@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.13.7](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.13.6...v1.13.7) (2026-10-30)
+
+
+### Dependencies
+
+* **deps-dev:** Bump eslint from 10.11.0 to 10.13.0 ([85b8807](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/85b8807eb452606f1790e7bd3c29928c7da1936d))
+* **deps-dev:** Bump prettier from 3.9.8 to 3.9.10 ([6ed0989](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/6ed0989868ec585a8aed8178c009e40a8dca7474))
+* **deps-dev:** Bump the typescript-eslint group with 2 updates ([f55252f](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/f55252ffe3093761a149e0bbf5a2a7809f4c533c))
+* **deps:** Bump jose from 6.2.12 to 6.2.13 ([caebae9](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/caebae9cf1e4d5173c1536db8f446e8192f5206e))
+* **deps:** Bump the springboot group with 2 updates ([cfd05a6](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/cfd05a6d69231eaf99fe390a448447d837a6c224))
+* **deps:** Bump uuid from 14.0.2 to 14.0.3 ([705f840](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/705f84050212f878852dc6bcd4a6af0667624e69))
+
 ## [1.13.6](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.13.5...v1.13.6) (2026-09-25)
 
 
