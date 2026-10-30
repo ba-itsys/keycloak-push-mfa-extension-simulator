@@ -7,11 +7,17 @@ version: 2
 updates:
   - package-ecosystem: "maven"
     directory: "/"
+    open-pull-requests-limit: 10
     schedule:
       interval: "weekly"
     commit-message:
       prefix: "deps" # to trigger a new release (release-please)
       include: "scope"
+    groups:
+      springboot:
+        patterns:
+          - "org.springframework.boot:*"
+
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
@@ -19,11 +25,17 @@ updates:
     commit-message:
       prefix: "deps" # to trigger a new release (release-please)
       include: "scope"
+    groups:
+      typescript-eslint:
+        patterns:
+          - "@typescript-eslint/*"
+
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
-  - package-ecosystem: "docker-compose"
+
+  - package-ecosystem: "docker"
     directory: "/"
     schedule:
       interval: "weekly"
