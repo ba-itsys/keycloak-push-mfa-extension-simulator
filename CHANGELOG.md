@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.13.8](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.13.7...v1.13.8) (2026-11-11)
+
+
+### Dependencies
+
+* **deps-dev:** Bump com.diffplug.spotless:spotless-maven-plugin ([22cec50](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/22cec509a60bc2d06a5e297a6a29ff3977ce576b))
+* **deps-dev:** Bump eslint from 10.13.0 to 10.14.0 ([4a3fcfa](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/4a3fcfad064421c98510f5e0315b6aca4fc714b1))
+* **deps:** Bump jose from 6.2.13 to 6.2.14 ([4391f07](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/4391f07784c070516a610ef8955064066b2292d0))
+* **deps:** Bump jose from 6.2.14 to 6.2.15 ([a205efa](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/a205efa95adf8f79ebaa171df84a32d1d59102cc))
+
 ## [1.13.7](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.13.6...v1.13.7) (2026-11-02)
 
 
