@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.13.9](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.13.8...v1.13.9) (2026-11-25)
+
+
+### Dependencies
+
+* **deps-dev:** Bump com.diffplug.spotless:spotless-maven-plugin ([affd1e0](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/affd1e06eb9f15a539535bde65c6879985804fae))
+* **deps-dev:** Bump eslint from 10.14.0 to 10.15.0 ([307de22](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/307de22ad13aa019d66233ffe285aeab71080a07))
+* **deps-dev:** Bump prettier from 3.9.10 to 3.10.1 ([ca0b800](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/ca0b8005e342758931ed3c8dac2cb97c2978920f))
+* **deps-dev:** Bump the typescript-eslint group with 2 updates ([dbc1b6a](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/dbc1b6a61043360aa09b52a93f854d1f448bb76f))
+* **deps-dev:** Bump the typescript-eslint group with 2 updates ([f995637](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/f995637aff71395d9806ddafc0c19b125828c6b4))
+* **deps:** Bump jose from 6.2.15 to 6.2.17 ([3203afb](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/3203afb0d91cb7e0a80d40762ceeb54c582e7101))
+* **deps:** Bump jose from 6.2.17 to 6.2.18 ([2a43ad6](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/2a43ad6ec28993dec568df5feaad5f4146025e04))
+* **deps:** Bump the springboot group with 2 updates ([37114dc](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/commit/37114dcaa864c33f653bc63f702ed115e44ad2f1))
+
 ## [1.13.8](https://github.com/ba-itsys/keycloak-push-mfa-extension-simulator/compare/v1.13.7...v1.13.8) (2026-11-11)
 
 
